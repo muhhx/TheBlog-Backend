@@ -8,16 +8,16 @@ export async function registerUserHandler(req: Request, res: Response){
 
     //1. Data validation
     if (!name || !email || !emailConfirmation || !password || !passwordConfirmation) {
-        return res.status(400).json({ status: "Error", error: "Preencha todos os campos."});
+        return res.status(400).json({ status: "Error", message: "Preencha todos os campos."});
     }
     if (password.length < 6) {
-        return res.status(400).json({ status: "Error", error: "A senha precisa ter no mínimo 6 caracteres."});
+        return res.status(400).json({ status: "Error", message: "A senha precisa ter no mínimo 6 caracteres."});
     }
     if (email !== emailConfirmation) {
-        return res.status(400).json({ status: "Error", error: "Os emails não são iguais."});
+        return res.status(400).json({ status: "Error", message: "Os emails não são iguais."});
     }
     if (password !== passwordConfirmation) {
-        return res.status(400).json({ status: "Error", error: "As senhas não são iguais."});
+        return res.status(400).json({ status: "Error", message: "As senhas não são iguais."});
     }
 
     //2. Encrypt password
@@ -31,9 +31,9 @@ export async function registerUserHandler(req: Request, res: Response){
             email,
             password: encryptedPassword
         });
-        return res.status(201).json({ status: "Ok", data: createdUser })
+        return res.status(201).json({ status: "Ok", data: "Usuário criado com sucesso." })
     } catch (error) {
-        return res.status(400).json({ status: "Error", message: "Não foi possível criar sua conta, verifique se o email ja não está sendo usado ou tente novamente mais tarde.", error})
+        return res.status(400).json({ status: "Error", message: "Não foi possível criar sua conta, verifique se o email ja não está sendo usado ou tente novamente mais tarde.", error })
     }
 };
 

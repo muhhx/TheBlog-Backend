@@ -18,6 +18,7 @@
     2. blog poster (pode criar blogs e deletar apenas os seus)
     3. user (pode escrever comentarios)
 3. Session (quando o usuário é logado)???
+4. Newsletter (cheio de email)
 
 N precisa registrar pra comentar, comentario vai ser revisado?
 

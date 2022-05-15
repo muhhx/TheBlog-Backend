@@ -1,8 +1,11 @@
 import { Express } from "express";
-import { registerUserHandler } from "./controller/user.controller"
+import { registerUserHandler } from "./controller/user.controller";
+import { loginSessionHandler } from "./controller/session.controller";
 
 function routes(app: Express) {
-    app.post("/api/user", registerUserHandler)
+    app.post("/api/user", registerUserHandler);
+
+    app.post("/api/session", loginSessionHandler);
 
     // /api/user POST (Register new user)
     // /api/user/:id PUT (Update user, update role or name for example)
