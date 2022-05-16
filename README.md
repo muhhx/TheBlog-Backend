@@ -54,3 +54,11 @@ Duvidas atuais para serem respondidas
 
 Acess Token + Refresh Token
 -> Se depois de certo tempo, o access token expirar, o refresh token vai ser usado para dar um novo access token pro usuário
+
+
+Utilizar Apenas o accessToken por agora e setar o tempo do usuario para 1h, sla.
+No futuro, aprender sobre: 
+1. Cookies e tals
+2. Sessions
+3. Refresh Token (in details. SEARCH FOR > https://www.youtube.com/results?search_query=refresh+token+jwt)
+4. PEM algorithm, SSL and shit (https://stackoverflow.com/questions/63030755/error-error0909006cpem-routinesget-nameno-start-line-node)
