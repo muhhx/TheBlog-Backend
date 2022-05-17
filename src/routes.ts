@@ -5,7 +5,7 @@ import verifyUser from "./middleware/verifyUser";
 
 function routes(app: Express) {
     // /api/user POST (Register new user)
-    // /api/user/:id PUT (Update user, update role or name for example, change password) A
+    // /api/user/:id PUT (Update user information, update role, change password) A
     // /api/user/:id DELETE (Delete user) A
     // RECUPERAR SENHA
     app.post("/api/user", registerUserHandler);
@@ -21,8 +21,14 @@ function routes(app: Express) {
     // /api/blog DELETE (Delete post) A
     // /api/blog PUT (Update blog post) A
     // /api/blog GET (Get all blog posts)
-    // /api/blog/:id GET (Get specific blog post)
-    // /api/blog/q?=queries GET (pagination getting posts by page) => In order to get home projects, just query for them instead of creating a new route
+    // /api/blog?teste=queries GET (pagination getting posts by page, any type of filtering) => In order to get home projects, just query for them instead of creating a new route
+    // /api/blog/:id GET (Get specific blog post BY SLUG not ID)
+
+    // /api/comment POST (post a comment)
+    // /api/comment/:id DELETE (Delete comment)
+    // /api/comment/:id PUT (Update comment)
+    // /api/comment?user=userId GET (Query user's comments)
+    // /api/comment?post=postId GET (Query post's comments)
 
     // /api/newsletter POST (Submit email to newsletter)
 };

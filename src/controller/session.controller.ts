@@ -21,7 +21,7 @@ export async function loginSessionHandler(req: Request, res: Response) {
     }
 
     //2. Create JWT
-    const accessToken = createJWT({ userId: user._id, userEmail: user.email, userName: user.name }, "1h")
+    const accessToken = createJWT({ userId: user._id, userEmail: user.email, userName: user.name, userRole: user.role }, "1h")
 
     res.cookie("accessToken", accessToken, {
         maxAge: 3.6e+6,

@@ -58,7 +58,41 @@ Acess Token + Refresh Token
 
 Utilizar Apenas o accessToken por agora e setar o tempo do usuario para 1h, sla.
 No futuro, aprender sobre: 
+https://www.youtube.com/watch?v=EqzUcMzfV1w&t=1995s&ab_channel=TraversyMedia (Around 1h, 13min)
 1. Cookies e tals
 2. Sessions
 3. Refresh Token (in details. SEARCH FOR > https://www.youtube.com/results?search_query=refresh+token+jwt)
 4. PEM algorithm, SSL and shit (https://stackoverflow.com/questions/63030755/error-error0909006cpem-routinesget-nameno-start-line-node)
+
+
+## Funcionalidades:
+1. Não logado:
+    - Pode sign in para newsletter
+2. User:
+    - Comentar em post ("Seus comentários")
+    - Update dados do seu usuário, Deletar seu usuário (seus comentários não serão deletados, porem suas fotos e nomes dos comentarios aparecerão "Usuario deletado")
+2. Blogger
+    - Tudo acima
+    - Revisar comentários do seu próprio post
+    - Criar, update e deletar post (Contanto que seja apenas o seu)
+    - Update dados do seu usuário, Deletar seu usuário (seus posts não serão deletados)
+    https://jacurtis.com/author/alex-curtis/
+3. Admin
+    - Tudo 
+    - Mudar roles dos usuários
+    https://www.youtube.com/results?search_query=designing+a+database+blog
+
+## Funcionalidades Blog Social Media
+1. Se você não estiver logado, você pode ver alguns posts
+2. Se você estiver logado, você pode comentar e criar posts (no futuro posso adicionar outras funcionalidades de SEGUIR, UPVOTE POST, UPVOTE COMMENTS, SAVE POST, etc)
+    Apenas o ADM e o criador do comentário podem deletar o comentário
+
+Getting liked posts:
+
+User makes request
+Middleware verify if user is auth
+LikedPostsID.Model get (will get the id of all liked posts from this user in this table)
+likedPosts = AllPostsDatabase.Model get if postId === likedPostId (will get all posts that have the id)
+return likedPosts
+
+Posso fazer isso com tudo (posts com mais upvotes, posts com tags === "cats", etc)
