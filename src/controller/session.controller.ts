@@ -11,7 +11,7 @@ export async function loginSessionHandler(req: Request, res: Response) {
         return res.status(400).json({ status: "Error", message: "Preencha todos os campos."})
     }
 
-    const user = await UserModel.findOne({ email });
+    const user = await UserModel.findOne({ email }).select('+password');
 
     if(!user) {
         return res.status(401).json({ status: "Error", message: "Email ou senha inválido."})
@@ -21,7 +21,7 @@ export async function loginSessionHandler(req: Request, res: Response) {
     }
 
     //2. Create JWT
-    const accessToken = createJWT({ userId: user._id, userEmail: user.email, userName: user.name, userRole: user.role }, "1h")
+    const accessToken = createJWT({ userId: user._id, userUsername: user.username, userName: user.name, userRole: user.role }, "1h")
 
     res.cookie("accessToken", accessToken, {
         maxAge: 3.6e+6,

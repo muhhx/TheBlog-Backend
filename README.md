@@ -86,6 +86,8 @@ https://www.youtube.com/watch?v=EqzUcMzfV1w&t=1995s&ab_channel=TraversyMedia (Ar
 1. Se você não estiver logado, você pode ver alguns posts
 2. Se você estiver logado, você pode comentar e criar posts (no futuro posso adicionar outras funcionalidades de SEGUIR, UPVOTE POST, UPVOTE COMMENTS, SAVE POST, etc)
     Apenas o ADM e o criador do comentário podem deletar o comentário
+3. Para gerenciar (Deletar, update e tals), comentários e posts, criar página "Gerenciar comentarios / Gerenciar posts"
+Quando vc for fazer request de comentarios e pegar o authorId, porem o BD nao encontrar usuario com esse id, setar Nome: Deleted user
 
 Getting liked posts:
 
