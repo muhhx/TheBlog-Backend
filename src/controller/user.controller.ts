@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import config from "config";
 import UserModel from "../models/user.model";
-import { findUserWithoutPassword, deleteUser } from "../db";
+import { findUserWithoutPassword } from "../db";
 
 export async function registerUserHandler(req: Request, res: Response){
     const { name, username, email, emailConfirmation, password, passwordConfirmation } = req.body;
@@ -38,7 +38,7 @@ export async function registerUserHandler(req: Request, res: Response){
         });
         return res.status(201).json({ status: "Ok", data: "Usuário criado com sucesso." })
     } catch (error) {
-        return res.status(400).json({ status: "Error", message: "Não foi possível criar sua conta, verifique se o email ja não está sendo usado ou tente novamente mais tarde.", error })
+        return res.status(400).json({ status: "Error", message: "Não foi possível criar sua conta, verifique se o email ou username ja não está sendo usado ou tente novamente mais tarde.", error })
     }
 };
 
@@ -56,49 +56,49 @@ export async function getUserHandler(req: Request, res: Response) {
 
 export async function deleteUserHandler(req: Request, res: Response) {
     // @ts-ignore
-    const { userId, userRole } = req.user; //if you are admin, you dont need to provide the user's password.
-    const { username } = req.params;
+    const { userId } = req.user;
     const { password } = req.body;
 
-    if(!password && userRole !== "admin") {
+    if(!password) {
         return res.status(400).json({ status: "Error", message: "Informe sua senha." });
     }
 
-    //Gets data from the person making the request
-    const currentUser = await UserModel.findById(userId).select('+password');
+    const user = await UserModel.findById(userId).select('+password');
 
-    if(!currentUser) {
-        return res.status(404).json({ status: "Error", message: "Usuário não encontrado." });
+    if(!user) {
+        return res.status(404).json({ status: "Error", message: "Não foi possível deletar o usuário." });
     };
-    
-    //Verify if the user making the request is the same being deleted
-    if(username !== currentUser.username && userRole !== "admin") {
-        return res.status(400).json({ status: "Error", message: "Você não pode deletar outros usuários." });
-    }
 
     try {
-        //Verify if the password provided is correct
-        if(!await bcrypt.compare(String(password), currentUser.password) && userRole !== "admin") {
+        if(!await bcrypt.compare(String(password), user.password)) {
             return res.status(401).json({ status: "Error", message: "Senha inválida." });
         };
 
-        //3. Delete user from database
-        const result = await deleteUser(username);
+        const response = await UserModel.findByIdAndDelete(userId);
 
-        if(!result) {
+        if(!response) {
             return res.status(400).json({ status: "Error", message: "Não foi possível deletar o usuário." });
         }
         
-        //4. Revoke JWT Cookies
-        if(userRole !== "admin") {
-            res.cookie("accessToken", "", {
-                maxAge: 0,
-                httpOnly: true,
-            });
-        }
+        res.cookie("accessToken", "", {
+            maxAge: 0,
+            httpOnly: true,
+        });
         
         res.status(200).json({ status: "Ok", message: "Usuário foi deletado.", reload: true });
     } catch (error) {
         return res.status(400).json({ status: "Error", message: "Não foi possível deletar o usuário." });
     }
+};
+
+export async function updateUserHandler(req: Request, res: Response) {
+    // @ts-ignore
+    const { userId } = req.user;
+    const { password, passwordConfirmation } = req.body;
+
+    //1. Você só vai poder fazer o upload do user do token atual
+    //2. Validations
+    //3. Update
+    //4. Response, reloading the page (so it can show to him)
+    res.json({ message: "Rota em manutenção." })
 };

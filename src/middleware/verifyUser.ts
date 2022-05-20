@@ -5,7 +5,7 @@ async function verifyUser(req: Request, res: Response, next: NextFunction) {
     const { accessToken } = req.cookies;
 
     if(!accessToken) {
-        return res.status(403).json({ success: "Error", message: "Faça o login para acessar os dados.", reload: true })
+        return res.status(403).json({ success: "Error", message: "Faça o login para continuar.", reload: true })
     };
 
     const user = await verifyJWT(accessToken);

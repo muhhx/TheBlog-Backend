@@ -82,12 +82,6 @@ https://www.youtube.com/watch?v=EqzUcMzfV1w&t=1995s&ab_channel=TraversyMedia (Ar
     - Mudar roles dos usuários
     https://www.youtube.com/results?search_query=designing+a+database+blog
 
-## Funcionalidades Blog Social Media
-1. Se você não estiver logado, você pode ver alguns posts
-2. Se você estiver logado, você pode comentar e criar posts (no futuro posso adicionar outras funcionalidades de SEGUIR, UPVOTE POST, UPVOTE COMMENTS, SAVE POST, etc)
-    Apenas o ADM e o criador do comentário podem deletar o comentário
-3. Para gerenciar (Deletar, update e tals), comentários e posts, criar página "Gerenciar comentarios / Gerenciar posts"
-Quando vc for fazer request de comentarios e pegar o authorId, porem o BD nao encontrar usuario com esse id, setar Nome: Deleted user
 
 Getting liked posts:
 
@@ -98,3 +92,29 @@ likedPosts = AllPostsDatabase.Model get if postId === likedPostId (will get all 
 return likedPosts
 
 Posso fazer isso com tudo (posts com mais upvotes, posts com tags === "cats", etc)
+
+
+    // /api/user POST (Register new user)
+    // /api/user/:id PUT (Update user information, change password) A
+    // /api/user/:id DELETE (Delete user) A
+    // /api/user/:id GET (Get a specific user)
+
+    // RECUPERAR SENHA
+    // VERIFICAR EMAIL - pra fazer login precisa ter email verificado
+
+    // /api/session POST (Login)
+    // /api/session DELETE (Logout) A
+    // /api/session GET (Verify session) A
+
+    // /api/blog POST (Create post) A
+    // /api/blog DELETE (Delete post) A
+    // /api/blog PUT (Update blog post) A
+    // /api/blog GET (Get all blog posts)
+    // /api/blog?teste=queries GET (pagination getting posts by page, any type of filtering) => In order to get home projects, just query for them instead of creating a new route
+    // /api/blog/:id GET (Get specific blog post BY SLUG not ID)
+
+    // /api/comment POST (post a comment) A
+    // /api/comment/:id DELETE (Delete comment) A
+    // /api/comment/:id PUT (Update comment) A
+    // /api/comment?user=userId GET (Query user's comments)
+    // /api/comment?post=postId GET (Query post's comments)

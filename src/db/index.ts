@@ -13,17 +13,3 @@ export async function findUserWithoutPassword(field: String, input: String) {
         return null
     }
 };
-
-export async function deleteUser(username: String) {
-    try {
-        const response = await UserModel.remove({ username: username})
-
-        if(!response || response.deletedCount < 1) {
-            return null
-        }
-
-        return response
-    } catch (error) {
-        return null      
-    }
-};
