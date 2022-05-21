@@ -95,12 +95,14 @@ Posso fazer isso com tudo (posts com mais upvotes, posts com tags === "cats", et
 
 
     // /api/user POST (Register new user)
-    // /api/user/:id PUT (Update user information, change password) A
-    // /api/user/:id DELETE (Delete user) A
+    // /api/user/ PUT (Update normal user info) A
+        /api/user/password 
+        /api/user/email (no need to auth the email here)
+    // /api/user/ DELETE (Delete user) A
     // /api/user/:id GET (Get a specific user)
+    // /api/user/email - Verifica email
 
     // RECUPERAR SENHA
-    // VERIFICAR EMAIL - pra fazer login precisa ter email verificado
 
     // /api/session POST (Login)
     // /api/session DELETE (Logout) A
@@ -118,3 +120,10 @@ Posso fazer isso com tudo (posts com mais upvotes, posts com tags === "cats", et
     // /api/comment/:id PUT (Update comment) A
     // /api/comment?user=userId GET (Query user's comments)
     // /api/comment?post=postId GET (Query post's comments)
+
+        //Toda vez que os dados dos currentUser mudam, gerar novo JWT
+    app.put("/api/user", [verifyUser, verifyEmail], updateUserHandler); //Updates normal information (Name, Bio, Avatar, username)
+    app.put("/api/user/email", verifyUser, () => {}) //Updates email (everytime the email is update, set user's isEmailVerified to false so he can verify again. Also logout user so he can generate a new valid JWT token)
+    app.put("/api/user/password", [verifyUser, verifyEmail], () => {}) //Change password (Posso fazer isso na rota normal também)
+    app.put("/api/user/verify", [verifyUser], () => {}); // Route to verify email (returns if is verified or not) - if its verified, logout the user and refresh the page
+    

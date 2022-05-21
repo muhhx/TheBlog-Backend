@@ -8,20 +8,25 @@ export async function loginSessionHandler(req: Request, res: Response) {
 
     //1. User Authentication
     if(!email || !password) {
-        return res.status(400).json({ status: "Error", message: "Preencha todos os campos."})
+        return res.status(400).json({ status: "Error", message: "Preencha todos os campos." })
     }
 
     const user = await UserModel.findOne({ email }).select('+password');
 
     if(!user) {
-        return res.status(401).json({ status: "Error", message: "Email ou senha inválido."})
+        return res.status(401).json({ status: "Error", message: "Email ou senha inválido." })
     }
     if(!await bcrypt.compare(String(password), user.password)) {
-        return res.status(401).json({ status: "Error", message: "Email ou senha inválido."})
+        return res.status(401).json({ status: "Error", message: "Email ou senha inválido." })
     }
 
+    //Verifies if user already confirmed their email
+    if(!user.isEmailVerified) {
+        return res.status(401).json({ success: "Error", message: "Verifique seu email para continuar." })
+    };
+
     //2. Create JWT
-    const accessToken = createJWT({ userId: user._id, userUsername: user.username, userName: user.name, userRole: user.role }, "1h")
+    const accessToken = createJWT({ userId: user._id, userUsername: user.username, userName: user.name, isEmailVerified: user.isEmailVerified }, "1h")
 
     res.cookie("accessToken", accessToken, {
         maxAge: 3.6e+6,

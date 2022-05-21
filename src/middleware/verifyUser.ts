@@ -15,6 +15,11 @@ async function verifyUser(req: Request, res: Response, next: NextFunction) {
     };
 
     // @ts-ignore
+    if(!user.isEmailVerified) {
+        return res.status(401).json({ success: "Error", message: "Verifique seu email para continuar." })
+    };
+
+    // @ts-ignore
     req.user = user;
     return next();
 };

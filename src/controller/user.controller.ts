@@ -1,21 +1,22 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 import config from "config";
 import UserModel from "../models/user.model";
 import { findUserWithoutPassword } from "../db";
 
 export async function registerUserHandler(req: Request, res: Response){
-    const { name, username, email, emailConfirmation, password, passwordConfirmation } = req.body;
+    const { name, email, emailConfirmation, password, passwordConfirmation } = req.body;
 
     //1. Data validation
-    if (!name || !username || !email || !emailConfirmation || !password || !passwordConfirmation) {
+    if (!name || !email || !emailConfirmation || !password || !passwordConfirmation) {
         return res.status(400).json({ status: "Error", message: "Preencha todos os campos."});
-    }
-    if(!/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{3,29}$/.test(username)) {
-        return res.status(400).json({ status: "Error", message: "O username não é valido, confira as regras."});
     }
     if (password.length < 6) {
         return res.status(400).json({ status: "Error", message: "A senha precisa ter no mínimo 6 caracteres."});
+    }
+    if (name.length > 30) {
+        return res.status(400).json({ status: "Error", message: "O nome é muito longo."});
     }
     if (email !== emailConfirmation) {
         return res.status(400).json({ status: "Error", message: "Os emails não são iguais."});
@@ -27,6 +28,10 @@ export async function registerUserHandler(req: Request, res: Response){
     //2. Encrypt password
     const salt = config.get<number>('bcryptSalt');
     const encryptedPassword = await bcrypt.hash(String(password), salt);
+
+    //3. Generate random username based on the Name provided
+    const usernameHash = crypto.randomBytes(10);
+    const username = usernameHash.toString('hex');
 
     //3. Save to the database
     try {
@@ -94,11 +99,15 @@ export async function deleteUserHandler(req: Request, res: Response) {
 export async function updateUserHandler(req: Request, res: Response) {
     // @ts-ignore
     const { userId } = req.user;
-    const { password, passwordConfirmation } = req.body;
+    const { name, username, bio } = req.body;
 
-    //1. Você só vai poder fazer o upload do user do token atual
-    //2. Validations
-    //3. Update
-    //4. Response, reloading the page (so it can show to him)
+    // Validação
+    // Update (Criar objeto e update todos os itens do usuário)
+    // Refresh Token pro usuário ver os updates
+
+    //Verificar username
+    // if(!/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{3,29}$/.test(username)) {
+    //     return res.status(400).json({ status: "Error", message: "O username não é valido, confira as regras."});
+    // }
     res.json({ message: "Rota em manutenção." })
 };
