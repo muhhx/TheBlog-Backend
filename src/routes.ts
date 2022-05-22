@@ -27,8 +27,10 @@ function routes(app: Express) {
     app.delete("/api/session", logoutSessionHandler);
     app.get("/api/session", verifyUser, verifySessionHandler);
 
-    app.post("/api/follow/:targetId", verifyUser, userFollowHandler); //Follow
-    app.delete("/api/follow/:targetId", verifyUser, userUnfollowHandler); //Unf
+    app.post("/api/follow/:targetId", verifyUser, userFollowHandler);
+    app.delete("/api/follow/:targetId", verifyUser, userUnfollowHandler);
+    app.get("/api/followers/:userId", userFollowersHandler);
+    app.get("/api/following/:userId", userFollowingHandler);
 
     app.post("/api/post", verifyUser, createPostHandler);
     app.delete("/api/post", verifyUser);
