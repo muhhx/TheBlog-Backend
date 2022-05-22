@@ -22,7 +22,7 @@ export async function loginSessionHandler(req: Request, res: Response) {
 
     //Verifies if user already confirmed their email
     if(!user.isEmailVerified) {
-        return res.status(401).json({ success: "Error", message: "Verifique seu email para continuar." })
+        return res.status(401).json({ success: "Error", message: "Verifique seu email para continuar. Clique aqui para enviar o email novamente." })
     };
 
     //2. Create JWT

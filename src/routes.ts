@@ -1,17 +1,19 @@
 import { Express } from "express";
 import { loginSessionHandler, logoutSessionHandler, verifySessionHandler } from "./controller/session.controller";
-import { registerUserHandler, getUserHandler, deleteUserHandler, updateUserHandler } from "./controller/user.controller";
+import { registerUserHandler, getUserHandler, deleteUserHandler, updateUserHandler, forgotPasswordHandler, resetPassowrdHandler } from "./controller/user.controller";
 import { createPostHandler } from "./controller/post.controller";
 import verifyUser from "./middleware/verifyUser";
 
 function routes(app: Express) {
     //Toda vez que os dados dos currentUser mudam, gerar novo JWT
-    app.put("/api/user", verifyUser, updateUserHandler);
+    app.put("/api/user", verifyUser, updateUserHandler); //Esperar 5 minutos pra mudar username ou email novamente (isso impede spam)
     app.post("/api/user", registerUserHandler);
     app.delete("/api/user", verifyUser, deleteUserHandler);
     app.get("/api/user/:username", getUserHandler);
-    //forgot password
-    //refresh tokens
+
+    app.post("/api/user/forgotpassword", forgotPasswordHandler);
+    app.put("/api/user/resetpassword/:resetToken", resetPassowrdHandler);
+    app.put("/api/user/confirmemail/:confirmToken");
     
     app.post("/api/session", loginSessionHandler);
     app.delete("/api/session", logoutSessionHandler);

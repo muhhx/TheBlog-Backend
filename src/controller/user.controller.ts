@@ -4,6 +4,7 @@ import crypto from "crypto";
 import config from "config";
 import UserModel from "../models/user.model";
 import { findUserWithoutPassword } from "../db";
+import { htmlMail, sendMail } from "../utils/email";
 
 export async function registerUserHandler(req: Request, res: Response){
     const { name, email, emailConfirmation, password, passwordConfirmation } = req.body;
@@ -111,3 +112,81 @@ export async function updateUserHandler(req: Request, res: Response) {
     // }
     res.json({ message: "Rota em manutenção." })
 };
+
+export async function forgotPasswordHandler(req: Request, res: Response) {
+    const { email } = req.body;
+
+    const user = await UserModel.findOne({ email });
+
+    //1. Verification
+    if(!email) {
+        return res.status(401).json({ status: "Error", message: "Por favor, informe um email." })
+    }
+    if(!user) {
+        return res.status(400).json({ status: "Error", message: "O email informado é inválido." })
+    }
+    if(user.resetPasswordToken && user.resetPasswordExpire > Date.now()) {
+        return res.status(400).json({ status: "Error", message: "Email já foi enviado, espere 10 minutos para enviar um novo email." })
+    }
+
+    try {
+        //2. Create tokens
+        const resetToken = crypto.randomBytes(20).toString('hex');
+        const resetExpire = Date.now() + 10 * (60 * 1000);
+
+        await UserModel.findByIdAndUpdate( user.id, { resetPasswordToken: resetToken, resetPasswordExpire: resetExpire })
+
+        //3. Send email
+        const html = htmlMail("resetpassword", resetToken)
+
+        const response = await sendMail({ to: email, subject: "Reset Password", html });
+
+        if(!response) {
+            await UserModel.findByIdAndUpdate( user.id, { resetPasswordToken: null, resetPasswordExpire: null })
+
+            return res.status(500).json({ status: "Error", message: "Email não pode ser enviado." })
+        }
+
+        return res.status(200).json({ status: "Ok", message: "Verifique sua caixa de entrada." })
+    } catch (error) {
+        return res.status(500).json({ status: "Error", message: "Algo deu errado, tente novamente mais tarde." })
+    }
+};
+
+export async function resetPassowrdHandler(req: Request, res: Response) {
+    const { resetToken } = req.params;
+    const { password, passwordConfirmation } = req.body;
+
+    const user = await UserModel.findOne({ resetPasswordToken: resetToken }).select('+password')
+
+    if(!user) {
+        return res.status(404).json({ status: "Error", message: "Token inválido." })
+    }
+    if(user.resetPasswordExpire < Date.now()) {
+        return res.status(404).json({ status: "Error", message: "Token expirado." })
+    }
+
+    if(!password || !passwordConfirmation) {
+        return res.status(401).json({ status: "Error", message: "Preencha todos os campos." })
+    }
+    if(password.length < 6) {
+        return res.status(401).json({ status: "Error", message: "A senha precisa ter no mínimo 6 caracteres." })
+    }
+    if(password !== passwordConfirmation) {
+        return res.status(401).json({ status: "Error", message: "As senhas precisam ser iguais." })
+    }
+
+    try {
+        if(await bcrypt.compare(String(password), user.password)) {
+            return res.status(401).json({ status: "Error", message: "A senha nova deve ser diferente da anterior." })
+        }
+
+        const hashedPassword = await bcrypt.hash(String(password), 10);
+
+        await UserModel.findByIdAndUpdate( user.id, { password: hashedPassword, resetPasswordExpire: null, resetPasswordToken: null });
+
+        return res.status(200).json({ status: "Ok", message: "Senha atualizada com sucesso, faça o login para continuar."})
+    } catch (error) {
+        return res.status(500).json({ status: "Error", message: "Não foi possível mudar sua senha, tente novamente mais tarde."})
+    }
+}

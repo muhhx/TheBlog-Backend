@@ -6,6 +6,8 @@ export default interface IUser {
     password: string;
     role: string;
     bio: string;
+    resetPasswordToken: string;
+    resetPasswordExpire: Number;
     createdAt: Date;
     updatedAt: Date;
 };
