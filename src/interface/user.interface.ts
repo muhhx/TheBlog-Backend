@@ -8,6 +8,8 @@ export default interface IUser {
     bio: string;
     resetPasswordToken: string;
     resetPasswordExpire: Number;
+    confirmEmailToken: string;
+    confirmEmailExpire: Number;
     createdAt: Date;
     updatedAt: Date;
 };

@@ -120,7 +120,7 @@ export async function forgotPasswordHandler(req: Request, res: Response) {
 
     //1. Verification
     if(!email) {
-        return res.status(401).json({ status: "Error", message: "Por favor, informe um email." })
+        return res.status(401).json({ status: "Error", message: "Informe um email." })
     }
     if(!user) {
         return res.status(400).json({ status: "Error", message: "O email informado é inválido." })
@@ -188,5 +188,69 @@ export async function resetPassowrdHandler(req: Request, res: Response) {
         return res.status(200).json({ status: "Ok", message: "Senha atualizada com sucesso, faça o login para continuar."})
     } catch (error) {
         return res.status(500).json({ status: "Error", message: "Não foi possível mudar sua senha, tente novamente mais tarde."})
+    }
+}
+
+export async function confirmEmailHandler(req: Request, res: Response) {
+    const { email } = req.body;
+
+    const user = await UserModel.findOne({ email });
+    
+    //1. Validation (!email, email exists, email is already validated)
+    if(!email) {
+        return res.status(400).json({ status: "Error", message: "Informe um email." })
+    }
+    if(!user) {
+        return res.status(400).json({ status: "Error", message: "Email informado não existe." })
+    }
+    if(user.isEmailVerified) {
+        return res.status(400).json({ status: "Error", message: "Email já foi confirmado." })
+    }
+    if(user.confirmEmailToken && user.confirmEmailExpire > Date.now()) {
+        return res.status(400).json({ status: "Error", message: "Email já foi enviado, espere 10 minutos para enviar um novo email." })
+    }
+
+    //2. Create tokens (confirmEmailToken, confirmEmailExpires)
+    const confirmEmailToken = crypto.randomBytes(20).toString('hex');
+    const confirmEmailExpire = Date.now() + 10 * (60 * 1000);
+
+    try {
+        //3. Save them to the database
+        await UserModel.findByIdAndUpdate(user.id, { confirmEmailToken, confirmEmailExpire })
+        
+        //4. Send email
+        const html = htmlMail("confirmemail", confirmEmailToken);
+        const response = sendMail({ to: email, subject: "Confirm Email", html });
+
+        if(!response) {
+            await UserModel.findByIdAndUpdate(user.id, { confirmEmailToken: null, confirmEmailExpire: null });
+
+            return res.status(500).json({ status: "Error", message: "Não foi possível mandar o email de confirmação" });
+        }
+
+        return res.status(200).json({ status: "Ok", message: `Email enviado com sucesso para ${email}.` });
+    } catch (error) {
+        return res.status(500).json({ status: "Error", message: "Não foi possível mandar o email de confirmação" });
+    }
+};
+
+export async function validateEmailHandler(req: Request, res: Response) {
+    const { confirmToken } = req.params;
+
+    const user = await UserModel.findOne({ confirmEmailToken: confirmToken })
+
+    if(!user) {
+        return res.status(400).json({ status: "Error", message: "Token inválido." })
+    }
+    if(user.confirmEmailExpire < Date.now()) {
+        return res.status(400).json({ status: "Error", message: "Token expirado." })
+    }
+
+    try {
+        await UserModel.findByIdAndUpdate( user.id, { isEmailVerified: true, confirmEmailToken: null, confirmEmailExpire: null })
+
+        return res.status(200).json({ status: "Ok", message: "Email confirmado com sucesso. Faça login para continuar." })
+    } catch (error) {
+        return res.status(500).json({ status: "Error", message: "Não foi possível confirmar seu email." })
     }
 }

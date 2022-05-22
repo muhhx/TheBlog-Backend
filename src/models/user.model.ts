@@ -10,7 +10,9 @@ const userSchema = new mongoose.Schema<IUser>({
     role: { type: String, enum: ["user", "admin"], default: "user" },
     bio: { type: String },
     resetPasswordToken: { type: String },
-    resetPasswordExpire: { type: Number }
+    resetPasswordExpire: { type: Number },
+    confirmEmailToken: { type: String },
+    confirmEmailExpire: { type: Number },
 }, {
     collection: 'users',
     timestamps: true

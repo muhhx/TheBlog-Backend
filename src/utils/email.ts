@@ -7,12 +7,12 @@ interface IEmail {
     html: string
 }
 
-export function htmlMail(endpoint: String, resetToken: String) {
+export function htmlMail(endpoint: String, token: String) {
     const url = config.get<string>("url");
 
-    const link = `${url}/${endpoint}/${resetToken}`;
+    const link = `${url}/${endpoint}/${token}`;
 
-    const html = `<a href=${link} clicktracking=off>Click here to reset your password</a>`;
+    const html = `<a href=${link} clicktracking=off>Click here to reset your password OR confirm your email</a>`;
 
     return html;
 }

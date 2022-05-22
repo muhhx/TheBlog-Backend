@@ -1,6 +1,6 @@
 import { Express } from "express";
 import { loginSessionHandler, logoutSessionHandler, verifySessionHandler } from "./controller/session.controller";
-import { registerUserHandler, getUserHandler, deleteUserHandler, updateUserHandler, forgotPasswordHandler, resetPassowrdHandler } from "./controller/user.controller";
+import { registerUserHandler, getUserHandler, deleteUserHandler, updateUserHandler, forgotPasswordHandler, resetPassowrdHandler, confirmEmailHandler, validateEmailHandler } from "./controller/user.controller";
 import { createPostHandler } from "./controller/post.controller";
 import verifyUser from "./middleware/verifyUser";
 
@@ -11,9 +11,10 @@ function routes(app: Express) {
     app.delete("/api/user", verifyUser, deleteUserHandler);
     app.get("/api/user/:username", getUserHandler);
 
-    app.post("/api/user/forgotpassword", forgotPasswordHandler);
-    app.put("/api/user/resetpassword/:resetToken", resetPassowrdHandler);
-    app.put("/api/user/confirmemail/:confirmToken");
+    app.post("/api/forgotpassword", forgotPasswordHandler);
+    app.put("/api/resetpassword/:resetToken", resetPassowrdHandler); //Delete tokens from database instad of setting it null
+    app.post("/api/confirmemail", confirmEmailHandler);
+    app.put("/api/confirmemail/:confirmToken", validateEmailHandler);
     
     app.post("/api/session", loginSessionHandler);
     app.delete("/api/session", logoutSessionHandler);
