@@ -33,7 +33,7 @@ export async function userFollowHandler(req: Request, res: Response) {
             targetId
         });
 
-        return res.status(200).json({ status: "Ok", message: "Você seguiu o usuário.", data: createFollow });
+        return res.status(200).json({ status: "Ok", message: "Você seguiu o usuário." });
     } catch (error) {
         return res.status(500).json({ status: "Error", message: "Algo deu errado. Não foi possível seguir este usuário." });
     }
@@ -84,9 +84,13 @@ export async function userFollowersHandler(req: Request, res: Response) {
     }
 
     try {
-        const followers = await FollowModel.find({ targetId: userId }) 
+        const followers = await FollowModel.find({ targetId: { $eq: userId } }, { userId: 1, _id: 0 }) 
 
-        return res.status(200).json({ status: "Ok", message: "Seguidores deste usuário.", data: followers });
+        const array = followers.map(follower => follower.userId)
+
+        const users = await UserModel.find({ _id: { $in: array } })
+        
+        return res.status(200).json({ status: "Ok", message: "Seguidores deste usuário.", data: users, followersCount: array.length });
     } catch (error) {
         return res.status(500).json({ status: "Error", message: "Algo deu errado. Não foi possivel encontrar os usuários." });
     }
@@ -106,9 +110,13 @@ export async function userFollowingHandler(req: Request, res: Response) {
     }
 
     try {
-        const following = await FollowModel.find({ userId: userId }) 
+        const following = await FollowModel.find({ userId: { $eq: userId } }, { targetId: 1, _id: 0 }) 
 
-        return res.status(200).json({ status: "Ok", message: "Usuários.", data: following });
+        const array = following.map(follow => follow.targetId)
+
+        const users = await UserModel.find({ _id: { $in: array } })
+        
+        return res.status(200).json({ status: "Ok", message: "Usuários que você está seguindo.", data: users, followingCount: array.length });
     } catch (error) {
         return res.status(500).json({ status: "Error", message: "Algo deu errado. Não foi possivel encontrar os usuários." });
     }

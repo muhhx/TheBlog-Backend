@@ -32,6 +32,9 @@ function routes(app: Express) {
     app.get("/api/followers/:userId", userFollowersHandler);
     app.get("/api/following/:userId", userFollowingHandler);
 
+    //Mandar apenas os ids das pessoas q vc segue?? AI no front eu faço requisições para cada usuário?
+    //Ja mandar pro front os usuários com esse ID!!!!!!! com os ids, eu consigo ja pegar a lista de usuários e mandar pro font os users mesmo
+
     app.post("/api/post", verifyUser, createPostHandler);
     app.delete("/api/post", verifyUser);
     app.put("/api/post", verifyUser);
