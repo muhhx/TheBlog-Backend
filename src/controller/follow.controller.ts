@@ -88,7 +88,7 @@ export async function userFollowersHandler(req: Request, res: Response) {
 
         const array = followers.map(follower => follower.userId)
 
-        const users = await UserModel.find({ _id: { $in: array } })
+        const users = await UserModel.find({ _id: { $in: array } }, { name: 1, username: 1 })
         
         return res.status(200).json({ status: "Ok", message: "Seguidores deste usuário.", data: users, followersCount: array.length });
     } catch (error) {
@@ -114,7 +114,7 @@ export async function userFollowingHandler(req: Request, res: Response) {
 
         const array = following.map(follow => follow.targetId)
 
-        const users = await UserModel.find({ _id: { $in: array } })
+        const users = await UserModel.find({ _id: { $in: array } }, { name: 1, username: 1 })
         
         return res.status(200).json({ status: "Ok", message: "Usuários que você está seguindo.", data: users, followingCount: array.length });
     } catch (error) {

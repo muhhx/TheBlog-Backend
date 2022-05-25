@@ -1,7 +1,7 @@
 import { Express } from "express";
 import { loginSessionHandler, logoutSessionHandler, verifySessionHandler } from "./controller/session.controller";
 import { registerUserHandler, getUserHandler, deleteUserHandler, updateUserHandler, forgotPasswordHandler, resetPassowrdHandler, confirmEmailHandler, validateEmailHandler } from "./controller/user.controller";
-import { createPostHandler } from "./controller/post.controller";
+import { createPostHandler, deletePostHandler, updatePostHandler } from "./controller/post.controller";
 import { userFollowHandler, userUnfollowHandler, userFollowersHandler, userFollowingHandler } from "./controller/follow.controller";
 import verifyUser from "./middleware/verifyUser";
 
@@ -12,7 +12,8 @@ function routes(app: Express) {
     app.delete("/api/user", verifyUser, deleteUserHandler);
     
     app.get("/api/user/:username", getUserHandler);
-    // /api/user/:userID/posts (get all posts from this user)
+    // /api/user/:userID/posts (get all posts from this user) - se for ver algum post especifico, direciona para a rota original
+    // /api/user/:userID/saved (get all saved/favorited posts)
     // /api/user/:userID/comments
     // /api/user/:userID/upvotes
     // /api/user/:userID/followers
@@ -32,18 +33,17 @@ function routes(app: Express) {
     app.get("/api/followers/:userId", userFollowersHandler);
     app.get("/api/following/:userId", userFollowingHandler);
 
-    //Mandar apenas os ids das pessoas q vc segue?? AI no front eu faço requisições para cada usuário?
-    //Ja mandar pro front os usuários com esse ID!!!!!!! com os ids, eu consigo ja pegar a lista de usuários e mandar pro font os users mesmo
-
     app.post("/api/post", verifyUser, createPostHandler);
-    app.delete("/api/post", verifyUser);
-    app.put("/api/post", verifyUser);
+    app.delete("/api/post/:postId", verifyUser, deletePostHandler);
+    app.put("/api/post/:postId", verifyUser, updatePostHandler);
     app.get("/api/post") //Get all posts
     // get posts (queries and searchs, etc - what should appea to a person, etc)
 
 };
 
 export default routes;
+
+//Falta: update user info, update post + arrumar objeto "post" (definir melhores regras de negocio, tirar subtitulo, etc)
 
 //Fazer diferente: Quando o usuário é criado, ele precisa confirmar o email para logar
     // Gera um random username que pode ser mudado depois (dessa forma, eu não vou ter pessoas espamando usernames e tals)
@@ -55,3 +55,18 @@ export default routes;
     //Não pode mudar email -- se vc mudar, apenas set isEmailVerified para false de novo
     //Pode mudar username e outras informações + change password
     //Quando você UPDATE as infos do usuario, incluindo a senha e username, nao é necessário gerar novo token pois ja sabemos que o usuário está autenticado. Porém, se ele fizer o logout, na proxima vez que ele for logar, precisará das informações corretas - O id presente no JWT nao muda
+
+    //Comments:
+    //1. Query all comments and store it in a variable "comments"
+    //2. Map through all comments and check if(currentComment.replyTo !== null)
+        //Se for, replyTo.replies.push(currentComment) - replyTo variable indicates what comment id the currentComment is replying to
+        //Else, faz nada
+
+    //Everything is provided by the user, including summmary
+    //Subtitle = summary
+    //Ate 5 tags
+    //formata e cria o slug baseado no titulo
+    
+    //1. Remove todos os special characters
+    //2. lowercase
+    //3. adiciona slash nos espaços
