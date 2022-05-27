@@ -1,9 +1,10 @@
 import { Express } from "express";
 import { loginSessionHandler, logoutSessionHandler, verifySessionHandler } from "./controller/session.controller";
 import { registerUserHandler, getUserHandler, deleteUserHandler, updateUserHandler, forgotPasswordHandler, resetPassowrdHandler, confirmEmailHandler, validateEmailHandler } from "./controller/user.controller";
-import { createPostHandler, deletePostHandler, updatePostHandler, getPostHandler } from "./controller/post.controller";
+import { createPostHandler, deletePostHandler, updatePostHandler, getPostHandler, getPostsHandler, getUserPostsHandler } from "./controller/post.controller";
 import { userFollowHandler, userUnfollowHandler, userFollowersHandler, userFollowingHandler } from "./controller/follow.controller";
 import verifyUser from "./middleware/verifyUser";
+import { deleteFavoriteHandler, saveFavoriteHandler, userFavoritesHandler } from "./controller/favorite.controller";
 
 function routes(app: Express) {
     //Toda vez que os dados dos currentUser mudam, gerar novo JWT
@@ -12,17 +13,12 @@ function routes(app: Express) {
     app.delete("/api/user", verifyUser, deleteUserHandler);
     
     app.get("/api/user/:username", getUserHandler);
-    // /api/user/:userID/posts (get all posts from this user) - se for ver algum post especifico, direciona para a rota original
-    // /api/user/:userID/saved (get all saved/favorited posts)
+    app.get("/api/user/:userId/followers", userFollowersHandler);
+    app.get("/api/user/:userId/following", userFollowingHandler);
+    app.get("/api/user/:userId/posts", getUserPostsHandler);
+    app.get("/api/user/:userId/favorites", verifyUser, userFavoritesHandler);
     // /api/user/:userID/comments
     // /api/user/:userID/upvotes
-    // /api/user/:userID/followers
-    // /api/user/:userID/following
-
-    // Notifications
-    // Post tag
-    // Post category?
-    // Saveg posts
 
     app.post("/api/forgotpassword", forgotPasswordHandler);
     app.put("/api/resetpassword/:resetToken", resetPassowrdHandler);
@@ -35,19 +31,15 @@ function routes(app: Express) {
 
     app.post("/api/follow/:targetId", verifyUser, userFollowHandler);
     app.delete("/api/follow/:targetId", verifyUser, userUnfollowHandler);
-    app.get("/api/followers/:userId", userFollowersHandler);
-    app.get("/api/following/:userId", userFollowingHandler);
 
     app.post("/api/post", verifyUser, createPostHandler);
     app.delete("/api/post/:postId", verifyUser, deletePostHandler);
     app.put("/api/post/:postId", verifyUser, updatePostHandler);
-    app.get("/api/post/:postId", getPostHandler);
-    // app.get("/api/post") //Get all posts
-    //get posts from people that i follow (auth)
-    //get posts from tags
-    //get posts with a specific title
-    //get my posts, do this in the user endpoints
-    //get posts that are trending and shit
+    app.get("/api/post/:slug", getPostHandler);
+    app.get("/api/post", getPostsHandler); //Add pagination and filters (specific tag, metatag or title research)
+
+    app.post("/api/favorite/:postId", verifyUser, saveFavoriteHandler);
+    app.delete("/api/favorite/:postId", verifyUser, deleteFavoriteHandler);
 
     //página inicial: mostrar todos os posts + opção de selecionar categoria especifica + pesquisar, tipo behance
 };
@@ -72,12 +64,3 @@ export default routes;
     //2. Map through all comments and check if(currentComment.replyTo !== null)
         //Se for, replyTo.replies.push(currentComment) - replyTo variable indicates what comment id the currentComment is replying to
         //Else, faz nada
-
-    //Everything is provided by the user, including summmary
-    //Subtitle = summary
-    //Ate 5 tags
-    //formata e cria o slug baseado no titulo
-    
-    //1. Remove todos os special characters
-    //2. lowercase
-    //3. adiciona slash nos espaços

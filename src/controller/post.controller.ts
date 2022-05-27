@@ -130,5 +130,47 @@ export async function updatePostHandler(req: Request, res: Response) {
 }
 
 export async function getPostHandler(req: Request, res: Response) {
-    return res.send("Rota em manutenção")
+    const { slug } = req.params;
+
+    try {
+        const post = await PostModel.findOne({ slug });
+
+        if(!post) {
+            return res.status(400).json({ status: "Error", message: "O post que você está tentando acessar não existe." });
+        }
+
+        return res.status(200).json({ status: "Ok", data: post });
+    } catch (error) {
+        return res.status(500).json({ status: "Error", message: "Algo deu errado ao tentar acessar o post." })
+    }
+}
+
+export async function getPostsHandler(req: Request, res: Response) {
+    const queryParams = req.query["param"];
+    //Pagination
+    //Tags, etc
+
+    try {
+        const posts = await PostModel.find();
+
+        return res.status(200).json({ status: "Ok", data: posts })
+    } catch (error) {
+        return res.status(500).json({ status: "Error", message: "Algo deu errado ao tentar acessar os posts." })
+    }
+}
+
+export async function getUserPostsHandler(req: Request, res: Response) {
+    const { userId } = req.params;
+
+    if(!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ status: "Error", message: "O post que você está tentando acessar não é válido." });
+    }
+
+    try {
+        const posts = await PostModel.find({ authorId: { $eq: userId }})
+
+        return res.status(200).json({ status: "Ok", data: posts })
+    } catch (error) {
+        return res.status(500).json({ status: "Error", message: "Algo deu errado ao tentar acessar o post." })
+    }
 }
