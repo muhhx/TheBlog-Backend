@@ -1,7 +1,7 @@
 import { Express } from "express";
 import { loginSessionHandler, logoutSessionHandler, verifySessionHandler } from "./controller/session.controller";
 import { registerUserHandler, getUserHandler, deleteUserHandler, updateUserHandler, forgotPasswordHandler, resetPassowrdHandler, confirmEmailHandler, validateEmailHandler } from "./controller/user.controller";
-import { createPostHandler, deletePostHandler, updatePostHandler } from "./controller/post.controller";
+import { createPostHandler, deletePostHandler, updatePostHandler, getPostHandler } from "./controller/post.controller";
 import { userFollowHandler, userUnfollowHandler, userFollowersHandler, userFollowingHandler } from "./controller/follow.controller";
 import verifyUser from "./middleware/verifyUser";
 
@@ -18,6 +18,11 @@ function routes(app: Express) {
     // /api/user/:userID/upvotes
     // /api/user/:userID/followers
     // /api/user/:userID/following
+
+    // Notifications
+    // Post tag
+    // Post category?
+    // Saveg posts
 
     app.post("/api/forgotpassword", forgotPasswordHandler);
     app.put("/api/resetpassword/:resetToken", resetPassowrdHandler);
@@ -36,9 +41,15 @@ function routes(app: Express) {
     app.post("/api/post", verifyUser, createPostHandler);
     app.delete("/api/post/:postId", verifyUser, deletePostHandler);
     app.put("/api/post/:postId", verifyUser, updatePostHandler);
-    app.get("/api/post") //Get all posts
-    // get posts (queries and searchs, etc - what should appea to a person, etc)
+    app.get("/api/post/:postId", getPostHandler);
+    // app.get("/api/post") //Get all posts
+    //get posts from people that i follow (auth)
+    //get posts from tags
+    //get posts with a specific title
+    //get my posts, do this in the user endpoints
+    //get posts that are trending and shit
 
+    //página inicial: mostrar todos os posts + opção de selecionar categoria especifica + pesquisar, tipo behance
 };
 
 export default routes;

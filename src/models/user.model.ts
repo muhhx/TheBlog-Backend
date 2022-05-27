@@ -21,3 +21,9 @@ const userSchema = new mongoose.Schema<IUser>({
 const UserModel = mongoose.model("User", userSchema);
 
 export default UserModel;
+
+//Adicionar: 
+// Social medias
+// Total likes (of all your posts) -- nao preciso colocar isso no perfil, sera feito de maneira automatica
+// Link
+// Contato (phone + contactEmail)
