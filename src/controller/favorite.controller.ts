@@ -74,7 +74,7 @@ export async function userFavoritesHandler(req: Request, res: Response) {
 
         const posts = await PostModel.find({ _id: { $in: array } })
 
-        return res.status(200).json({ status: "Ok", data: posts });
+        return res.status(200).json({ status: "Ok", data: posts, favoriteCount: array.length });
     } catch (error) {
         return res.status(400).json({ status: "Error", message: "Ocorreu algum erro ao acessar seus posts favoritos." });
     }

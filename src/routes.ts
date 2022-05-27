@@ -5,6 +5,7 @@ import { createPostHandler, deletePostHandler, updatePostHandler, getPostHandler
 import { userFollowHandler, userUnfollowHandler, userFollowersHandler, userFollowingHandler } from "./controller/follow.controller";
 import verifyUser from "./middleware/verifyUser";
 import { deleteFavoriteHandler, saveFavoriteHandler, userFavoritesHandler } from "./controller/favorite.controller";
+import { deleteUpvoteHandler, getUpvoteHandler, postUpvoteHandler } from "./controller/upvote.controller";
 
 function routes(app: Express) {
     //Toda vez que os dados dos currentUser mudam, gerar novo JWT
@@ -17,8 +18,6 @@ function routes(app: Express) {
     app.get("/api/user/:userId/following", userFollowingHandler);
     app.get("/api/user/:userId/posts", getUserPostsHandler);
     app.get("/api/user/:userId/favorites", verifyUser, userFavoritesHandler);
-    // /api/user/:userID/comments
-    // /api/user/:userID/upvotes
 
     app.post("/api/forgotpassword", forgotPasswordHandler);
     app.put("/api/resetpassword/:resetToken", resetPassowrdHandler);
@@ -41,7 +40,16 @@ function routes(app: Express) {
     app.post("/api/favorite/:postId", verifyUser, saveFavoriteHandler);
     app.delete("/api/favorite/:postId", verifyUser, deleteFavoriteHandler);
 
-    //página inicial: mostrar todos os posts + opção de selecionar categoria especifica + pesquisar, tipo behance
+    app.post("/api/upvote/:postId", verifyUser, postUpvoteHandler);
+    app.delete("/api/upvote/:postId", verifyUser, deleteUpvoteHandler);
+    app.get("/api/upvote/:postId", getUpvoteHandler);
+
+    //api/comment/:postId POST Auth (Comment on a post)
+    //api/comment/:postId DELETE Auth (Delete comment)
+    //api/comment/:postId GET (Get posts' comments)
+    //api/comment/:postId/upvote POST (Upvote comment)
+    //api/comment/:postId/upvote DELETE (Remote comments upvote)
+    //api/comment/:postId/upvote GET (get comments upvotesCount)
 };
 
 export default routes;
