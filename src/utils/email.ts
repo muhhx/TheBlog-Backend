@@ -2,48 +2,48 @@ import nodemailer from "nodemailer";
 import config from "config";
 
 interface IEmail {
-    to: string,
-    subject: string,
-    html: string
+  to: string;
+  subject: string;
+  html: string;
 }
 
 export function htmlMail(endpoint: String, token: String) {
-    const url = config.get<string>("url");
+  const url = config.get<string>("url");
 
-    const link = `${url}/${endpoint}/${token}`;
+  const link = `http://localhost:3000/${endpoint}/${token}`;
 
-    const html = `<a href=${link} clicktracking=off>Click here to reset your password OR confirm your email</a>`;
+  const html = `<a href=${link} clicktracking=off>Click here to reset your password OR confirm your email</a>`;
 
-    return html;
+  return html;
 }
 
 export async function sendMail(options: IEmail) {
-    const service = config.get<string>("nodemailerService");
-    const user = config.get<string>("nodemailerUser");
-    const pass = config.get<string>("nodemailerPass");
+  const service = config.get<string>("nodemailerService");
+  const user = config.get<string>("nodemailerUser");
+  const pass = config.get<string>("nodemailerPass");
 
-    const transporter = nodemailer.createTransport({
-        service,
-        host: "smtp.gmail.com",
-        port: 465,
-        auth: {
-            user,
-            pass 
-        }
-    });
+  const transporter = nodemailer.createTransport({
+    service,
+    host: "smtp.gmail.com",
+    port: 465,
+    auth: {
+      user,
+      pass,
+    },
+  });
 
-    const mailOptions = {
-        from: user,
-        to: options.to,
-        subject: options.subject,
-        html: options.html
-    };
+  const mailOptions = {
+    from: user,
+    to: options.to,
+    subject: options.subject,
+    html: options.html,
+  };
 
-    try {
-        const response = await transporter.sendMail(mailOptions)
+  try {
+    const response = await transporter.sendMail(mailOptions);
 
-        return response;
-    } catch (error) {
-        return null;
-    }
+    return response;
+  } catch (error) {
+    return null;
+  }
 }

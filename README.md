@@ -1,28 +1,3 @@
-### Theo Webert Blog - Backend
-
-- Register
-- Login
-- Get all posts (not protected)
-- Get 6 posts (then 6+, then 6+ as the user requests for the data) - PAGINATION (not protected)
-- Get posts from home (not protected)
-- Update post (protected)
-- Delete post (protected)
-- Create post (protected)
-- Email
-
-### Models
-1. Blog Post (+ Comentários, + Autor, relacionando com o user) 
-2. Comentarios
-2. User (user can register and shit, make posts)
-    1. admin (tem todas as funcionalidades)
-    2. blog poster (pode criar blogs e deletar apenas os seus)
-    3. user (pode escrever comentarios)
-3. Session (quando o usuário é logado)???
-4. Newsletter (cheio de email)
-
-N precisa registrar pra comentar, comentario vai ser revisado?
-
-
 Mandar o markdown em formato de string, ai quando a pessoa entrar na pagina do post, transformar o markdown em html de alguma maneira
 Front-end: Recebe post contendo uma string em formato de markdown, usar essa string com package react-markdown, que converte a string em hmtl
 

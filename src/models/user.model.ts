@@ -1,29 +1,45 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 import IUser from "../interface/user.interface";
 
-const userSchema = new mongoose.Schema<IUser>({
-    name: { type: String, required: true },
-    username: { type: String, required: true, unique: true },
-    email: { type: String, required: true, unique: true, match: [/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/, "Informe um email válido."] },
+const userSchema = new mongoose.Schema<IUser>(
+  {
+    name: {
+      type: String,
+      required: true,
+      match: [/^[a-zA-Z_]+( [a-zA-Z_]+)*$/, "O nome é inválido"],
+      minlength: [1, "Pelo menos 1 caracter."],
+      maxlength: [30, "No maximo 30 caracteres"],
+    },
+    username: { type: String, required: true, unique: true }, //REJEX
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     isEmailVerified: { type: Boolean, default: false },
-    password: { type: String, required: true, select: false },
+    password: {
+      type: String,
+      required: true,
+      // match: [
+      //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/,
+      //   "Informe uma senha válida",
+      // ],
+      select: false,
+    },
     role: { type: String, enum: ["user", "admin"], default: "user" },
-    bio: { type: String },
+    bio: { type: String }, //REJEX MAX LIMIT
     resetPasswordToken: { type: String },
     resetPasswordExpire: { type: Number },
     confirmEmailToken: { type: String },
     confirmEmailExpire: { type: Number },
-}, {
-    collection: 'users',
-    timestamps: true
-});
+    refreshToken: { type: String, select: false },
+  },
+  {
+    collection: "users",
+    timestamps: true,
+  }
+);
 
 const UserModel = mongoose.model("User", userSchema);
 
 export default UserModel;
-
-//Adicionar: 
-// Social medias
-// Total likes (of all your posts) -- nao preciso colocar isso no perfil, sera feito de maneira automatica
-// Link
-// Contato (phone + contactEmail)

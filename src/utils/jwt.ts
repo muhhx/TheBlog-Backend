@@ -1,18 +1,21 @@
 import jwt from "jsonwebtoken";
-import config from "config";
 
-const privateKey = config.get<string>('accessTokenPrivateKey');
+export function createJWT(
+  payload: object,
+  key: string,
+  expiresIn: number | string
+) {
+  return jwt.sign(payload, key, { expiresIn });
+}
 
-export function createJWT(payload: object, expiresIn: number | string) {
-    return jwt.sign(payload, privateKey, { expiresIn });
-};
+export async function verifyJWT(token: string, key: string) {
+  try {
+    const decoded = jwt.verify(token, key);
 
-export async function verifyJWT(token: string) {
-    try {
-        const decoded = jwt.verify(token, privateKey)
+    return decoded;
+  } catch (error) {
+    return null;
+  }
+}
 
-        return decoded;
-    } catch (error) {
-        return null;
-    }
-};
+//VERIFYJWT
