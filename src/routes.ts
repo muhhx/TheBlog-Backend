@@ -45,16 +45,15 @@ import { getBackgroundHandler } from "./controller/background.controller";
 function routes(app: Express) {
   app.get("/api/background", getBackgroundHandler);
 
-  //Toda vez que os dados dos currentUser mudam, gerar novo JWT
   app.put("/api/user", verifyUser, updateUserHandler); //Esperar 5 minutos pra mudar username ou email novamente (isso impede spam)
   app.post("/api/user", registerUserHandler);
   app.delete("/api/user", verifyUser, deleteUserHandler);
 
   app.get("/api/user/:username", getUserHandler);
-  app.get("/api/user/:userId/followers", userFollowersHandler);
-  app.get("/api/user/:userId/following", userFollowingHandler);
-  app.get("/api/user/:userId/posts", getUserPostsHandler);
-  app.get("/api/user/:userId/favorites", verifyUser, userFavoritesHandler);
+  app.get("/api/user/:username/followers", userFollowersHandler);
+  app.get("/api/user/:username/following", userFollowingHandler);
+  app.get("/api/user/:username/posts", getUserPostsHandler);
+  app.get("/api/user/:username/favorites", verifyUser, userFavoritesHandler);
 
   app.post("/api/forgotpassword", forgotPasswordHandler);
   app.put("/api/resetpassword/:resetToken", resetPassowrdHandler);
@@ -93,7 +92,7 @@ function routes(app: Express) {
   //Post tags
   //User tags
   //Comment
-  //Notification
+  //Notification -- Usar axios interceptors pra toda vez q eu curtir, seguir, etc, criar uma notificação no banco de dados
 }
 
 export default routes;

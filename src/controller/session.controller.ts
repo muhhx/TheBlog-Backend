@@ -48,8 +48,8 @@ export async function loginSessionHandler(req: Request, res: Response) {
     isEmailVerified: user.isEmailVerified,
   };
 
-  const accessToken = createJWT(payload, accessKey, "10s");
-  const refreshToken = createJWT(payload, refreshKey, "20s");
+  const accessToken = createJWT(payload, accessKey, "600s");
+  const refreshToken = createJWT(payload, refreshKey, "1d");
 
   //Save refresh token to the database
   user.refreshToken = refreshToken;
@@ -158,7 +158,7 @@ export async function refreshTokenHandler(req: Request, res: Response) {
       isEmailVerified: user.isEmailVerified,
     };
 
-    const accessToken = createJWT(payload, accessKey, "10s");
+    const accessToken = createJWT(payload, accessKey, "600s");
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,

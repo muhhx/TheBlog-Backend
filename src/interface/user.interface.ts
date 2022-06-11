@@ -1,11 +1,12 @@
 export default interface IUser {
   name: string;
   email: string;
-  isEmailVerified: Boolean;
   username: String;
   password: string;
   role: string;
   bio: string;
+  picture: string;
+  isEmailVerified: Boolean;
   resetPasswordToken: string;
   resetPasswordExpire: Number;
   confirmEmailToken: string;

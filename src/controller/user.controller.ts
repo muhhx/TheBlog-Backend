@@ -64,8 +64,11 @@ export async function registerUserHandler(req: Request, res: Response) {
     const createdUser = await UserModel.create({
       name,
       username,
+      bio: `Olá! Meu nome é ${name} e esta é minha nova conta. Me siga para ler meus futuros posts!`,
       email,
       password: encryptedPassword,
+      picture:
+        "https://firebasestorage.googleapis.com/v0/b/the-blog-565e3.appspot.com/o/visax-IqZyFphHYbw-unsplash.jpg?alt=media&token=cde739f6-671e-4d7f-b519-44fa4422caa6",
     });
     return res
       .status(201)
@@ -83,7 +86,17 @@ export async function registerUserHandler(req: Request, res: Response) {
 export async function getUserHandler(req: Request, res: Response) {
   const { username } = req.params;
 
-  const user = await findUserWithoutPassword("username", username);
+  const user = await UserModel.find(
+    { username: { $eq: username } },
+    {
+      isEmailVerified: 0,
+      confirmEmailExpire: 0,
+      confirmEmailToken: 0,
+      resetPasswordExpire: 0,
+      resetPasswordToken: 0,
+      __v: 0,
+    }
+  );
 
   if (!user) {
     return res.status(404).json({
@@ -92,7 +105,7 @@ export async function getUserHandler(req: Request, res: Response) {
     });
   }
 
-  return res.status(200).json({ status: "Ok", data: user });
+  return res.status(200).json({ status: "Ok", data: user[0] });
 }
 
 export async function deleteUserHandler(req: Request, res: Response) {
@@ -150,7 +163,7 @@ export async function deleteUserHandler(req: Request, res: Response) {
 export async function updateUserHandler(req: Request, res: Response) {
   // @ts-ignore
   const { userId } = req.user;
-  const { name, username, bio } = req.body;
+  const { name, username, bio, profile } = req.body;
 
   // Validação
   // Update (Criar objeto e update todos os itens do usuário)
@@ -183,14 +196,14 @@ export async function forgotPasswordHandler(req: Request, res: Response) {
     return res.status(400).json({
       status: "Error",
       message:
-        "Email já foi enviado, espere 10 minutos para enviar um novo email.",
+        "Email já foi enviado, espere 3 minutos para enviar um novo email.",
     });
   }
 
   try {
     //2. Create tokens
     const resetToken = crypto.randomBytes(20).toString("hex");
-    const resetExpire = Date.now() + 10 * (60 * 1000);
+    const resetExpire = Date.now() + 3 * (60 * 1000);
 
     await UserModel.findByIdAndUpdate(user.id, {
       resetPasswordToken: resetToken,
@@ -200,7 +213,7 @@ export async function forgotPasswordHandler(req: Request, res: Response) {
     //3. Send email
     const html = htmlMail("resetpassword", resetToken);
 
-    const response = await sendMail({
+    const response = sendMail({
       to: email,
       subject: "Reset Password",
       html,
