@@ -45,6 +45,7 @@ export async function loginSessionHandler(req: Request, res: Response) {
     userId: user._id,
     userUsername: user.username,
     userName: user.name,
+    userPicture: user.picture,
     isEmailVerified: user.isEmailVerified,
   };
 
@@ -68,6 +69,9 @@ export async function loginSessionHandler(req: Request, res: Response) {
     status: "Ok",
     message: "Usuário logado com sucesso.",
     userName: user.name,
+    userId: user._id,
+    userPicture: user.picture,
+    userUsername: user.username,
   });
 }
 
@@ -155,6 +159,7 @@ export async function refreshTokenHandler(req: Request, res: Response) {
       userId: user._id,
       userUsername: user.username,
       userName: user.name,
+      userPicture: user.picture,
       isEmailVerified: user.isEmailVerified,
     };
 

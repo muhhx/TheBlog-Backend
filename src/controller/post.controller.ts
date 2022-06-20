@@ -104,7 +104,7 @@ export async function deletePostHandler(req: Request, res: Response) {
 
     return res
       .status(200)
-      .json({ status: "Ok", message: "Post deletado com sucesso." });
+      .json({ status: "Ok", message: "Post deletado com sucesso.", postId });
   } catch (error) {
     return res.status(500).json({
       status: "Error",

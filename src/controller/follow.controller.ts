@@ -120,7 +120,7 @@ export async function userFollowersHandler(req: Request, res: Response) {
 
     const users = await UserModel.find(
       { _id: { $in: array } },
-      { name: 1, username: 1 }
+      { name: 1, username: 1, picture: 1 }
     );
 
     return res.status(200).json({
@@ -159,7 +159,7 @@ export async function userFollowingHandler(req: Request, res: Response) {
 
     const users = await UserModel.find(
       { _id: { $in: array } },
-      { name: 1, username: 1 }
+      { name: 1, username: 1, picture: 1 }
     );
 
     return res.status(200).json({

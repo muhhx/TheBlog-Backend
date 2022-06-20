@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema<IUser>(
       maxlength: [30, "No maximo 30 caracteres"],
     },
     username: { type: String, required: true, unique: true }, //REJEX
+    picture: { type: String, required: true },
     email: {
       type: String,
       required: true,
