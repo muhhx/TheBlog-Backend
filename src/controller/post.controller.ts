@@ -217,7 +217,25 @@ export async function getPostHandler(req: Request, res: Response) {
       });
     }
 
-    return res.status(200).json({ status: "Ok", data: post });
+    const user = await UserModel.find(
+      { _id: { $eq: post.authorId } },
+      { name: 1, picture: 1, username: 1 }
+    );
+
+    const deletedUser = {
+      name: "Usuário deletado",
+      picture:
+        "https://firebasestorage.googleapis.com/v0/b/the-blog-565e3.appspot.com/o/visax-IqZyFphHYbw-unsplash.jpg?alt=media&token=cde739f6-671e-4d7f-b519-44fa4422caa6",
+      username: null,
+    };
+
+    return res
+      .status(200)
+      .json({
+        status: "Ok",
+        data: post,
+        user: user.length === 0 ? deletedUser : user[0],
+      });
   } catch (error) {
     return res.status(500).json({
       status: "Error",

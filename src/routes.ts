@@ -34,6 +34,7 @@ import {
   deleteFavoriteHandler,
   saveFavoriteHandler,
   userFavoritesHandler,
+  checkFavoriteHandler,
 } from "./controller/favorite.controller";
 import {
   deleteUpvoteHandler,
@@ -45,7 +46,7 @@ import { getBackgroundHandler } from "./controller/background.controller";
 function routes(app: Express) {
   app.get("/api/background", getBackgroundHandler); //DONE
 
-  app.put("/api/user", verifyUser, updateUserHandler); //Esperar 5 minutos pra mudar username ou email novamente (isso impede spam)
+  app.put("/api/user", verifyUser, updateUserHandler);
   app.post("/api/user", registerUserHandler); //DONE
   app.delete("/api/user", verifyUser, deleteUserHandler);
 
@@ -71,14 +72,15 @@ function routes(app: Express) {
   app.post("/api/post", verifyUser, createPostHandler); //DONE
   app.delete("/api/post/:postId", verifyUser, deletePostHandler); //DONE
   app.put("/api/post/:postId", verifyUser, updatePostHandler);
-  app.get("/api/post/:slug", getPostHandler);
+  app.get("/api/post/:slug", getPostHandler); //DONE
   app.get("/api/post", getPostsHandler); //Add pagination + filters (specific tag, metatag or title research) + personalized content based on what the user likes (what tags did he liked. what types of tags he sees everyday, etc. - 10 posts per page (5 what he MOST like, 3 other tags that he likes 2 recomendations))
 
   app.post("/api/favorite/:postId", verifyUser, saveFavoriteHandler);
   app.delete("/api/favorite/:postId", verifyUser, deleteFavoriteHandler);
+  app.put("/api/favorite/:postId", checkFavoriteHandler); //DONE
 
-  app.post("/api/upvote/:postId", verifyUser, postUpvoteHandler);
-  app.delete("/api/upvote/:postId", verifyUser, deleteUpvoteHandler);
+  app.post("/api/upvote/:postId", verifyUser, postUpvoteHandler); //DONE
+  app.delete("/api/upvote/:postId", verifyUser, deleteUpvoteHandler); //DONE
   app.get("/api/upvote/:postId", getUpvoteHandler);
 
   //api/comment/:postId POST Auth (Comment on a post)

@@ -10,42 +10,34 @@ export async function saveFavoriteHandler(req: Request, res: Response) {
   const { postId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(postId)) {
-    return res
-      .status(400)
-      .json({
-        status: "Error",
-        message: "O post que você está tentando salvar não é válido.",
-      });
+    return res.status(400).json({
+      status: "Error",
+      message: "O post que você está tentando salvar não é válido.",
+    });
   }
 
   const post = await PostModel.findById(postId);
 
   if (!post) {
-    return res
-      .status(400)
-      .json({
-        status: "Error",
-        message: "O post que você está tentando salvar não existe.",
-      });
+    return res.status(400).json({
+      status: "Error",
+      message: "O post que você está tentando salvar não existe.",
+    });
   }
   if (userId === post.authorId) {
-    return res
-      .status(400)
-      .json({
-        status: "Error",
-        message: "Você não pode savar seus próprios posts.",
-      });
+    return res.status(400).json({
+      status: "Error",
+      message: "Você não pode savar seus próprios posts.",
+    });
   }
 
   const isFavorited = await FavoriteModel.findOne({ userId, postId });
 
   if (isFavorited) {
-    return res
-      .status(400)
-      .json({
-        status: "Error",
-        message: "O post que você está tentando salvar já foi favoritado.",
-      });
+    return res.status(400).json({
+      status: "Error",
+      message: "O post que você está tentando salvar já foi favoritado.",
+    });
   }
 
   try {
@@ -54,20 +46,16 @@ export async function saveFavoriteHandler(req: Request, res: Response) {
       postId,
     });
 
-    return res
-      .status(200)
-      .json({
-        status: "Ok",
-        message: "O post foi adicionado aos favoritos.",
-        data: createFavorite,
-      });
+    return res.status(200).json({
+      status: "Ok",
+      message: "O post foi adicionado aos favoritos.",
+      data: createFavorite,
+    });
   } catch (error) {
-    return res
-      .status(500)
-      .json({
-        status: "Error",
-        message: "Algo deu errado ao tentar salvar o post.",
-      });
+    return res.status(500).json({
+      status: "Error",
+      message: "Algo deu errado ao tentar salvar o post.",
+    });
   }
 }
 
@@ -80,12 +68,10 @@ export async function deleteFavoriteHandler(req: Request, res: Response) {
     const favorite = await FavoriteModel.findOne({ userId, postId });
 
     if (!favorite) {
-      return res
-        .status(400)
-        .json({
-          status: "Error",
-          message: "O post ainda não foi adicionado aos favoritos.",
-        });
+      return res.status(400).json({
+        status: "Error",
+        message: "O post ainda não foi adicionado aos favoritos.",
+      });
     }
 
     await FavoriteModel.findByIdAndDelete(favorite._id);
@@ -94,12 +80,10 @@ export async function deleteFavoriteHandler(req: Request, res: Response) {
       .status(200)
       .json({ status: "Ok", message: "O post foi removido dos favoritos." });
   } catch (error) {
-    return res
-      .status(400)
-      .json({
-        status: "Error",
-        message: "Ocorreu algum erro ao remover o post dos favoritos.",
-      });
+    return res.status(400).json({
+      status: "Error",
+      message: "Ocorreu algum erro ao remover o post dos favoritos.",
+    });
   }
 }
 
@@ -130,11 +114,30 @@ export async function userFavoritesHandler(req: Request, res: Response) {
       .status(200)
       .json({ status: "Ok", data: posts, favoriteCount: array.length });
   } catch (error) {
-    return res
-      .status(400)
-      .json({
-        status: "Error",
-        message: "Ocorreu algum erro ao acessar seus posts favoritos.",
-      });
+    return res.status(400).json({
+      status: "Error",
+      message: "Ocorreu algum erro ao acessar seus posts favoritos.",
+    });
+  }
+}
+
+export async function checkFavoriteHandler(req: Request, res: Response) {
+  const { postId } = req.params;
+  const { userId } = req.body;
+
+  try {
+    const response = await FavoriteModel.find({
+      userId: { $eq: userId },
+      postId: { $eq: postId },
+    });
+
+    const isSaved = response.length === 0 ? false : true;
+
+    return res.status(200).json({ status: "Ok", isSaved });
+  } catch (error) {
+    return res.status(400).json({
+      status: "Error",
+      message: "Ocorreu algum erro.",
+    });
   }
 }

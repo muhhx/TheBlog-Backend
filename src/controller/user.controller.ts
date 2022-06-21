@@ -165,6 +165,14 @@ export async function updateUserHandler(req: Request, res: Response) {
   const { userId } = req.user;
   const { name, username, bio, profile } = req.body;
 
+  /**
+   * Name: modificar a qualquer momento
+   * username: 15 dias
+   * Bio: qualquer momento
+   * Profile picture: escolher uma das opções
+   * Password: + password confirmation
+   */
+
   // Validação
   // Update (Criar objeto e update todos os itens do usuário)
   // Refresh Token pro usuário ver os updates
