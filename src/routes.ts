@@ -14,6 +14,7 @@ import {
   resetPassowrdHandler,
   confirmEmailHandler,
   validateEmailHandler,
+  updatePasswordHandler,
 } from "./controller/user.controller";
 import {
   createPostHandler,
@@ -47,6 +48,7 @@ function routes(app: Express) {
   app.get("/api/background", getBackgroundHandler); //DONE
 
   app.put("/api/user", verifyUser, updateUserHandler);
+  app.put("/api/user/password", verifyUser, updatePasswordHandler);
   app.post("/api/user", registerUserHandler); //DONE
   app.delete("/api/user", verifyUser, deleteUserHandler);
 
@@ -75,13 +77,13 @@ function routes(app: Express) {
   app.get("/api/post/:slug", getPostHandler); //DONE
   app.get("/api/post", getPostsHandler); //Add pagination + filters (specific tag, metatag or title research) + personalized content based on what the user likes (what tags did he liked. what types of tags he sees everyday, etc. - 10 posts per page (5 what he MOST like, 3 other tags that he likes 2 recomendations))
 
-  app.post("/api/favorite/:postId", verifyUser, saveFavoriteHandler);
-  app.delete("/api/favorite/:postId", verifyUser, deleteFavoriteHandler);
+  app.post("/api/favorite/:postId", verifyUser, saveFavoriteHandler); //DONE
+  app.delete("/api/favorite/:postId", verifyUser, deleteFavoriteHandler); //DONE
   app.put("/api/favorite/:postId", checkFavoriteHandler); //DONE
 
   app.post("/api/upvote/:postId", verifyUser, postUpvoteHandler); //DONE
   app.delete("/api/upvote/:postId", verifyUser, deleteUpvoteHandler); //DONE
-  app.get("/api/upvote/:postId", getUpvoteHandler);
+  app.get("/api/upvote/:postId", getUpvoteHandler); //DONE
 
   //api/comment/:postId POST Auth (Comment on a post)
   //api/comment/:postId DELETE Auth (Delete comment)

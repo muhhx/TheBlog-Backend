@@ -163,25 +163,114 @@ export async function deleteUserHandler(req: Request, res: Response) {
 export async function updateUserHandler(req: Request, res: Response) {
   // @ts-ignore
   const { userId } = req.user;
-  const { name, username, bio, profile } = req.body;
+  const { name, username, bio, picture } = req.body;
 
-  /**
-   * Name: modificar a qualquer momento
-   * username: 15 dias
-   * Bio: qualquer momento
-   * Profile picture: escolher uma das opções
-   * Password: + password confirmation
-   */
+  if (!name && !username && !bio && !picture) {
+    return res
+      .status(401)
+      .json({ status: "Error", message: "Preencha pelo menos um campo." });
+  }
+  if (name && name.length > 30) {
+    return res
+      .status(401)
+      .json({ status: "Error", message: "Informe um nome válido." });
+  }
+  if (name && !/^[a-zA-Z_]+( [a-zA-Z_]+)*$/.test(name)) {
+    return res
+      .status(401)
+      .json({ status: "Error", message: "Informe um nome válido." });
+  }
+  if (bio && bio.length > 140) {
+    return res
+      .status(401)
+      .json({ status: "Error", message: "Informe uma bio válida." });
+  }
+  if (username && !/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{3,29}$/.test(username)) {
+    return res.status(401).json({
+      status: "Error",
+      message: "O username não é valido.",
+    });
+  }
 
-  // Validação
-  // Update (Criar objeto e update todos os itens do usuário)
-  // Refresh Token pro usuário ver os updates
+  try {
+    const user = await UserModel.findById(userId);
 
-  //Verificar username
-  // if(!/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{3,29}$/.test(username)) {
-  //     return res.status(400).json({ status: "Error", message: "O username não é valido, confira as regras."});
-  // }
-  res.json({ message: "Rota em manutenção." });
+    if (!user) {
+      return res.status(500).json({
+        status: "Error",
+        message: "Algo deu errado ao atualizar o usuário.",
+      });
+    }
+
+    await UserModel.findByIdAndUpdate(userId, {
+      name,
+      username,
+      bio,
+      picture,
+    });
+
+    return res
+      .status(200)
+      .json({ status: "Ok", newUserData: { name, username, bio, picture } });
+  } catch (error) {
+    return res.status(500).json({ status: "Error", state: "Algo deu errado." });
+  }
+}
+
+export async function updatePasswordHandler(req: Request, res: Response) {
+  // @ts-ignore
+  const { userId } = req.user;
+  const { password, passwordConfirmation } = req.body;
+
+  //Validar senhas
+  if (!password && !passwordConfirmation) {
+    return res
+      .status(401)
+      .json({ status: "Error", message: "Preencha todos os campos" });
+  }
+  if (password.length < 6) {
+    return res.status(401).json({
+      status: "Error",
+      message: "A senha precisa ter no mínimo 6 caracteres",
+    });
+  }
+  if (password !== passwordConfirmation) {
+    return res
+      .status(401)
+      .json({ status: "Error", message: "As senhas precisam ser iguais" });
+  }
+
+  try {
+    const user = await UserModel.findById(userId).select("+password");
+
+    if (!user) {
+      return res
+        .status(500)
+        .json({ status: "Error", message: "Algo deu errado" });
+    }
+
+    if (!(await bcrypt.compare(String(password), user.password))) {
+      return res.status(401).json({
+        status: "Error",
+        message: "A senha nova deve ser diferente da anterior.",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(String(password), 10);
+
+    await UserModel.findByIdAndUpdate(user.id, {
+      password: hashedPassword,
+    });
+
+    return res.status(200).json({
+      status: "Ok",
+      message: "Senha atualizada com sucesso, faça o login para continuar.",
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ status: "Error", message: "Algo deu errado" });
+  }
 }
 
 export async function forgotPasswordHandler(req: Request, res: Response) {

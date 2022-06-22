@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema<IUser>(
       minlength: [1, "Pelo menos 1 caracter."],
       maxlength: [30, "No maximo 30 caracteres"],
     },
-    username: { type: String, required: true, unique: true }, //REJEX
+    username: { type: String, required: true, unique: true },
     picture: { type: String, required: true },
     email: {
       type: String,
@@ -21,14 +21,10 @@ const userSchema = new mongoose.Schema<IUser>(
     password: {
       type: String,
       required: true,
-      // match: [
-      //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/,
-      //   "Informe uma senha válida",
-      // ],
       select: false,
     },
     role: { type: String, enum: ["user", "admin"], default: "user" },
-    bio: { type: String }, //REJEX MAX LIMIT
+    bio: { type: String },
     resetPasswordToken: { type: String },
     resetPasswordExpire: { type: Number },
     confirmEmailToken: { type: String },
