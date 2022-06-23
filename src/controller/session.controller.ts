@@ -7,7 +7,6 @@ import { createJWT, verifyJWT } from "../utils/jwt";
 export async function loginSessionHandler(req: Request, res: Response) {
   const { email, password } = req.body;
 
-  //Validate Email, password, user exists
   if (!email || !password) {
     return res
       .status(400)
@@ -28,7 +27,6 @@ export async function loginSessionHandler(req: Request, res: Response) {
       .json({ status: "Error", message: "Email ou senha inválido." });
   }
 
-  //Verifies if user already confirmed their email
   if (!user.isEmailVerified) {
     return res.status(401).json({
       success: "Error",
@@ -37,7 +35,6 @@ export async function loginSessionHandler(req: Request, res: Response) {
     });
   }
 
-  //Create JWTs
   const accessKey = config.get<string>("accessTokenPrivateKey");
   const refreshKey = config.get<string>("refreshTokenPrivateKey");
 
@@ -52,11 +49,9 @@ export async function loginSessionHandler(req: Request, res: Response) {
   const accessToken = createJWT(payload, accessKey, "600s");
   const refreshToken = createJWT(payload, refreshKey, "1d");
 
-  //Save refresh token to the database
   user.refreshToken = refreshToken;
   const result = await user.save();
 
-  //Send Access and Refresh Token Cookies
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
   });

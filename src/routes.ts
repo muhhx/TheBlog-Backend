@@ -50,7 +50,7 @@ function routes(app: Express) {
   app.put("/api/user", verifyUser, updateUserHandler);
   app.put("/api/user/password", verifyUser, updatePasswordHandler);
   app.post("/api/user", registerUserHandler); //DONE
-  app.delete("/api/user", verifyUser, deleteUserHandler);
+  app.delete("/api/user", verifyUser, deleteUserHandler); // N PRECISO DELETAR OS POSTS DESTE USUARIO, APENAS DEIXAR COMO "USUARIO DELETADO"
 
   app.get("/api/user/:username", getUserHandler); //DONE
   app.get("/api/user/:username/followers", userFollowersHandler); //DONE
@@ -72,7 +72,7 @@ function routes(app: Express) {
   app.delete("/api/follow/:targetId", verifyUser, userUnfollowHandler); //DONE
 
   app.post("/api/post", verifyUser, createPostHandler); //DONE
-  app.delete("/api/post/:postId", verifyUser, deletePostHandler); //DONE
+  app.delete("/api/post/:postId", verifyUser, deletePostHandler); //DONE -- REMOVER TODOS OS LIKES E SALVOS RELACIONADOS A ESSE POST
   app.put("/api/post/:postId", verifyUser, updatePostHandler);
   app.get("/api/post/:slug", getPostHandler); //DONE
   app.get("/api/post", getPostsHandler); //Add pagination + filters (specific tag, metatag or title research) + personalized content based on what the user likes (what tags did he liked. what types of tags he sees everyday, etc. - 10 posts per page (5 what he MOST like, 3 other tags that he likes 2 recomendations))
@@ -99,13 +99,6 @@ function routes(app: Express) {
 
 export default routes;
 
-//Falta: update user info, update post + arrumar objeto "post" (definir melhores regras de negocio, tirar subtitulo, etc)
-
-//Unico problema: Criar conta no email de outra pessoa e nunca confirmar o email
-// Não é um problema pois a pessoa que criou nunca vai conseguir confirmar o email, pois n tem acesso, e a pessoa que foi usada, pode simplesmente FORGOT PASSWORD
-
-//Não pode mudar email -- se vc mudar, apenas set isEmailVerified para false de novo
-//Pode mudar username e outras informações + change password
 //Quando você UPDATE as infos do usuario, incluindo a senha e username, nao é necessário gerar novo token pois ja sabemos que o usuário está autenticado. Porém, se ele fizer o logout, na proxima vez que ele for logar, precisará das informações corretas - O id presente no JWT nao muda
 
 //Comments:

@@ -1,6 +1,6 @@
 export default interface IFavorite {
-    userId: String;
-    postId: String;
-    createdAt: Date;
-    updatedAt: Date;
-};
+  userId: string;
+  postId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}

@@ -86,26 +86,33 @@ export async function registerUserHandler(req: Request, res: Response) {
 export async function getUserHandler(req: Request, res: Response) {
   const { username } = req.params;
 
-  const user = await UserModel.find(
-    { username: { $eq: username } },
-    {
-      isEmailVerified: 0,
-      confirmEmailExpire: 0,
-      confirmEmailToken: 0,
-      resetPasswordExpire: 0,
-      resetPasswordToken: 0,
-      __v: 0,
-    }
-  );
+  try {
+    const user = await UserModel.find(
+      { username: { $eq: username } },
+      {
+        isEmailVerified: 0,
+        confirmEmailExpire: 0,
+        confirmEmailToken: 0,
+        resetPasswordExpire: 0,
+        resetPasswordToken: 0,
+        __v: 0,
+      }
+    );
 
-  if (!user) {
-    return res.status(404).json({
+    if (!user) {
+      return res.status(404).json({
+        status: "Error",
+        message: "Usuário não existe ou não pode ser encontrado.",
+      });
+    }
+
+    return res.status(200).json({ status: "Ok", data: user[0] });
+  } catch (error) {
+    return res.status(500).json({
       status: "Error",
-      message: "Usuário não existe ou não pode ser encontrado.",
+      message: "Não foi possível encontrar este usuário.",
     });
   }
-
-  return res.status(200).json({ status: "Ok", data: user[0] });
 }
 
 export async function deleteUserHandler(req: Request, res: Response) {
@@ -228,10 +235,12 @@ export async function updatePasswordHandler(req: Request, res: Response) {
       .status(401)
       .json({ status: "Error", message: "Preencha todos os campos" });
   }
-  if (password.length < 6) {
+  if (
+    !/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/.test(password)
+  ) {
     return res.status(401).json({
       status: "Error",
-      message: "A senha precisa ter no mínimo 6 caracteres",
+      message: "A senha é inválida.",
     });
   }
   if (password !== passwordConfirmation) {
@@ -249,7 +258,12 @@ export async function updatePasswordHandler(req: Request, res: Response) {
         .json({ status: "Error", message: "Algo deu errado" });
     }
 
-    if (!(await bcrypt.compare(String(password), user.password))) {
+    const isDifferentFromPreviousPassword = await bcrypt.compare(
+      String(password),
+      user.password
+    );
+
+    if (isDifferentFromPreviousPassword) {
       return res.status(401).json({
         status: "Error",
         message: "A senha nova deve ser diferente da anterior.",
@@ -264,7 +278,7 @@ export async function updatePasswordHandler(req: Request, res: Response) {
 
     return res.status(200).json({
       status: "Ok",
-      message: "Senha atualizada com sucesso, faça o login para continuar.",
+      message: "Senha atualizada com sucesso.",
     });
   } catch (error) {
     return res

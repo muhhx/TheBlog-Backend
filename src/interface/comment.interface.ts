@@ -1,7 +1,7 @@
 export default interface IComment {
-    authorId: String;
-    postId: String;
-    comment: String;
-    createdAt: Date;
-    updatedAt: Date;
-};
+  authorId: string;
+  postId: string;
+  comment: string;
+  createdAt: Date;
+  updatedAt: Date;
+}

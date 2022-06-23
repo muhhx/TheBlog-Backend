@@ -1,6 +1,6 @@
 export default interface IUpvote {
-    userId: String;
-    postId: String;
-    createdAt: Date;
-    updatedAt: Date;
-};
+  userId: string;
+  postId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
