@@ -47,10 +47,10 @@ import { getBackgroundHandler } from "./controller/background.controller";
 function routes(app: Express) {
   app.get("/api/background", getBackgroundHandler); //DONE
 
-  app.put("/api/user", verifyUser, updateUserHandler);
-  app.put("/api/user/password", verifyUser, updatePasswordHandler);
+  app.put("/api/user", verifyUser, updateUserHandler); //DONE
+  app.put("/api/user/password", verifyUser, updatePasswordHandler); //DONE
   app.post("/api/user", registerUserHandler); //DONE
-  app.delete("/api/user", verifyUser, deleteUserHandler); // N PRECISO DELETAR OS POSTS DESTE USUARIO, APENAS DEIXAR COMO "USUARIO DELETADO"
+  app.put("/api/user/delete", verifyUser, deleteUserHandler); // N PRECISO DELETAR OS POSTS DESTE USUARIO, APENAS DEIXAR COMO "USUARIO DELETADO"
 
   app.get("/api/user/:username", getUserHandler); //DONE
   app.get("/api/user/:username/followers", userFollowersHandler); //DONE

@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
+import FavoriteModel from "../models/favorite.model";
 import PostModel from "../models/post.model";
+import UpvoteModel from "../models/upvote.model";
 import UserModel from "../models/user.model";
 import { createSlug, createSummary } from "../utils/format";
 
@@ -101,6 +103,9 @@ export async function deletePostHandler(req: Request, res: Response) {
           "Algo deu errado ao tentar deletar seu post. Post não encontrado.",
       });
     }
+
+    await UpvoteModel.deleteMany({ postId: postId });
+    await FavoriteModel.deleteMany({ postId: postId });
 
     return res
       .status(200)
@@ -229,13 +234,11 @@ export async function getPostHandler(req: Request, res: Response) {
       username: null,
     };
 
-    return res
-      .status(200)
-      .json({
-        status: "Ok",
-        data: post,
-        user: user.length === 0 ? deletedUser : user[0],
-      });
+    return res.status(200).json({
+      status: "Ok",
+      data: post,
+      user: user.length === 0 ? deletedUser : user[0],
+    });
   } catch (error) {
     return res.status(500).json({
       status: "Error",

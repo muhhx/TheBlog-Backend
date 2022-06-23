@@ -5,6 +5,9 @@ import config from "config";
 import UserModel from "../models/user.model";
 import { findUserWithoutPassword } from "../db";
 import { htmlMail, sendMail } from "../utils/email";
+import UpvoteModel from "../models/upvote.model";
+import FavoriteModel from "../models/favorite.model";
+import FollowModel from "../models/follow.model";
 
 export async function registerUserHandler(req: Request, res: Response) {
   const { name, email, emailConfirmation, password, passwordConfirmation } =
@@ -134,7 +137,6 @@ export async function deleteUserHandler(req: Request, res: Response) {
       message: "Não foi possível deletar o usuário.",
     });
   }
-
   try {
     if (!(await bcrypt.compare(String(password), user.password))) {
       return res
@@ -150,6 +152,11 @@ export async function deleteUserHandler(req: Request, res: Response) {
         message: "Não foi possível deletar o usuário.",
       });
     }
+
+    await UpvoteModel.deleteMany({ userId: userId });
+    await FavoriteModel.deleteMany({ userId: userId });
+    await FollowModel.deleteMany({ userId: userId });
+    await FollowModel.deleteMany({ targetId: userId });
 
     res.cookie("accessToken", "", {
       maxAge: 0,
