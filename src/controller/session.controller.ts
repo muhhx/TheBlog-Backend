@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import config from "config";
 import UserModel from "../models/user.model";
 import { createJWT, verifyJWT } from "../utils/jwt";
+import IUser from "../interface/user.interface";
 
 export async function loginSessionHandler(req: Request, res: Response) {
   const { email, password } = req.body;
@@ -102,15 +103,33 @@ export async function logoutSessionHandler(req: Request, res: Response) {
   }
 }
 
-export function verifySessionHandler(req: Request, res: Response) {
+export async function verifySessionHandler(req: Request, res: Response) {
   // @ts-ignore
   const user = req.user;
 
-  res.status(200).json({
-    status: "Ok",
-    message: "O usuário está com um Token válido.",
-    data: user,
-  });
+  try {
+    const userData: any = await UserModel.findById(user.userId);
+
+    const filteredData = {
+      userId: userData._id,
+      userUsername: userData.username,
+      userName: userData.name,
+      userPicture: userData.picture,
+      isEmailVerified: userData.isEmailVerified,
+    };
+
+    res.status(200).json({
+      status: "Ok",
+      message: "O usuário está com um Token válido.",
+      data: filteredData,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "Error",
+      message: "Não foi possível verificar a sessão",
+      error,
+    });
+  }
 }
 
 export async function refreshTokenHandler(req: Request, res: Response) {
