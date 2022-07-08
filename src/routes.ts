@@ -30,7 +30,6 @@ import {
   userFollowersHandler,
   userFollowingHandler,
 } from "./controller/follow.controller";
-import verifyUser from "./middleware/verifyUser";
 import {
   deleteFavoriteHandler,
   saveFavoriteHandler,
@@ -42,7 +41,16 @@ import {
   getUpvoteHandler,
   postUpvoteHandler,
 } from "./controller/upvote.controller";
+import {
+  postCommentHandler,
+  deleteCommentHandler,
+  updateCommentHandler,
+  upvoteCommentHandler,
+  getCommentsHandler,
+} from "./controller/comment.controller";
 import { getBackgroundHandler } from "./controller/background.controller";
+import verifyUser from "./middleware/verifyUser";
+import errorHandling from "./middleware/errorHandling";
 
 function routes(app: Express) {
   app.get("/api/background", getBackgroundHandler); //DONE
@@ -85,16 +93,16 @@ function routes(app: Express) {
   app.delete("/api/upvote/:postId", verifyUser, deleteUpvoteHandler); //DONE
   app.get("/api/upvote/:postId", getUpvoteHandler); //DONE
 
-  //api/comment/:postId POST Auth (Comment on a post)
-  //api/comment/:postId DELETE Auth (Delete comment)
-  //api/comment/:postId GET (Get posts' comments)
-  //api/comment/:postId/upvote POST (Upvote comment)
-  //api/comment/:postId/upvote DELETE (Remote comments upvote)
-  //api/comment/:postId/upvote GET (get comments upvotesCount)
+  app.get("/api/comment/:postId", getCommentsHandler); // (Get posts' comments)
+  app.post("/api/comment/:postId", verifyUser, postCommentHandler); //(Comment on a post)
+  app.delete("/api/comment/:commentId", verifyUser, deleteCommentHandler); // Delete comment - dono do comentário
+  app.put("/api/comment/:commentId", verifyUser, updateCommentHandler); //(Update comment) dono do comentário
+  app.put("/api/comment/upvote/:commentId", verifyUser, upvoteCommentHandler); //(update commment upvoteCount + 1) Auth (precisa estar autenticado para poder fazer isso)
 
   //Tags (Post tags, user tags)
   //Comment
   //Notification -- Usar axios interceptors pra toda vez q eu curtir, seguir, etc, criar uma notificação no banco de dados
+  app.use(errorHandling);
 }
 
 export default routes;
