@@ -3,7 +3,8 @@ import bcrypt from "bcrypt";
 import config from "config";
 import UserModel from "../models/user.model";
 import { createJWT, verifyJWT } from "../utils/jwt";
-import IUser from "../interface/user.interface";
+import { getGoogleOAuthTokens, getGoogleUser } from "../utils/oauth";
+import crypto from "crypto";
 
 export async function loginSessionHandler(req: Request, res: Response) {
   const { email, password } = req.body;
@@ -191,5 +192,102 @@ export async function refreshTokenHandler(req: Request, res: Response) {
       status: "Error",
       message: "Houve um erro ao verificar o refresh token.",
     });
+  }
+}
+
+export async function googleOauthHandler(req: Request, res: Response) {
+  const code = req.query.code as string;
+
+  try {
+    const { id_token, access_token } = await getGoogleOAuthTokens({ code });
+
+    const googleUser = await getGoogleUser({ id_token, access_token });
+
+    if (!googleUser.verified_email) {
+      return res.status(403).json({
+        status: "Error",
+        message: "Sua conta do Google não é verificada.",
+      });
+    }
+
+    const user = await UserModel.findOne({ email: googleUser.email });
+
+    const payload = {
+      userId: "",
+      userUsername: "",
+      userName: "",
+      userPicture: "",
+      isEmailVerified: false,
+    };
+
+    const accessKey = config.get<string>("accessTokenPrivateKey");
+    const refreshKey = config.get<string>("refreshTokenPrivateKey");
+
+    if (!user) {
+      const usernameHash = crypto.randomBytes(10);
+      const username = usernameHash.toString("hex");
+
+      const salt = config.get<number>("bcryptSalt");
+      const encryptedPassword = await bcrypt.hash(
+        crypto.randomBytes(10).toString("hex"),
+        salt
+      );
+
+      const createdUser = await UserModel.create({
+        name: googleUser.given_name,
+        username,
+        bio: `Olá! Meu nome é ${googleUser.name} e esta é minha nova conta. Me siga para ler meus futuros posts!`,
+        email: googleUser.email,
+        password: encryptedPassword,
+        picture:
+          "https://firebasestorage.googleapis.com/v0/b/the-blog-565e3.appspot.com/o/visax-IqZyFphHYbw-unsplash.jpg?alt=media&token=cde739f6-671e-4d7f-b519-44fa4422caa6",
+        isEmailVerified: true,
+      });
+
+      payload.userId = String(createdUser._id);
+      payload.userUsername = createdUser.username;
+      payload.userName = createdUser.name;
+      payload.userPicture = createdUser.picture;
+      payload.isEmailVerified = true;
+
+      const accessToken = createJWT(payload, accessKey, "600s");
+      const refreshToken = createJWT(payload, refreshKey, "1d");
+
+      createdUser.refreshToken = refreshToken;
+      const result = await createdUser.save();
+
+      console.log(createdUser, payload, accessToken, refreshToken);
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+      });
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24,
+      });
+    } else {
+      payload.userId = String(user._id);
+      payload.userUsername = user.username;
+      payload.userName = user.name;
+      payload.userPicture = user.picture;
+      payload.isEmailVerified = true;
+
+      const accessToken = createJWT(payload, accessKey, "600s");
+      const refreshToken = createJWT(payload, refreshKey, "1d");
+
+      user.refreshToken = refreshToken;
+      const result = await user.save();
+
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+      });
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24,
+      });
+    }
+
+    res.redirect(`${process.env.CLIENT_BASE_URL}`);
+  } catch (error) {
+    return res.redirect(`${process.env.CLIENT_BASE_URL}/login`);
   }
 }

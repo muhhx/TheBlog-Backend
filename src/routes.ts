@@ -4,6 +4,7 @@ import {
   logoutSessionHandler,
   refreshTokenHandler,
   verifySessionHandler,
+  googleOauthHandler,
 } from "./controller/session.controller";
 import {
   registerUserHandler,
@@ -57,7 +58,7 @@ function routes(app: Express) {
   app.put("/api/user", verifyUser, updateUserHandler); //DONE
   app.put("/api/user/password", verifyUser, updatePasswordHandler); //DONE
   app.post("/api/user", registerUserHandler); //DONE
-  app.put("/api/user/delete", verifyUser, deleteUserHandler); // N PRECISO DELETAR OS POSTS DESTE USUARIO, APENAS DEIXAR COMO "USUARIO DELETADO"
+  app.put("/api/user/delete", verifyUser, deleteUserHandler); //DONE
 
   app.get("/api/user/:username", getUserHandler); //DONE
   app.get("/api/user/:username/followers", userFollowersHandler); //DONE
@@ -70,6 +71,7 @@ function routes(app: Express) {
   app.post("/api/confirmemail", confirmEmailHandler); //DONE
   app.put("/api/confirmemail/:confirmToken", validateEmailHandler); //DONE
 
+  app.get("/api/session/oauth/google", googleOauthHandler);
   app.post("/api/session", loginSessionHandler); //DONE
   app.delete("/api/session", logoutSessionHandler); //DONE
   app.get("/api/session", verifyUser, verifySessionHandler); //DONE
@@ -92,23 +94,12 @@ function routes(app: Express) {
   app.delete("/api/upvote/:postId", verifyUser, deleteUpvoteHandler); //DONE
   app.get("/api/upvote/:postId", getUpvoteHandler); //DONE
 
-  app.get("/api/comment/:postId", getCommentsHandler); // (Get posts' comments)
-  app.post("/api/comment/:postId", verifyUser, postCommentHandler); //(Comment on a post)
-  app.delete("/api/comment/:commentId", verifyUser, deleteCommentHandler); // Delete comment - dono do comentário
-  app.put("/api/comment/:commentId", verifyUser, updateCommentHandler); //(Update comment) dono do comentário
+  app.get("/api/comment/:postId", getCommentsHandler); //DONE
+  app.post("/api/comment/:postId", verifyUser, postCommentHandler); //DONE
+  app.delete("/api/comment/:commentId", verifyUser, deleteCommentHandler); //DONE
+  app.put("/api/comment/:commentId", verifyUser, updateCommentHandler); //DONE
 
-  //Tags (Post tags, user tags)
-  //Comment
-  //Notification -- Usar axios interceptors pra toda vez q eu curtir, seguir, etc, criar uma notificação no banco de dados
   app.use(errorHandling);
 }
 
 export default routes;
-
-//Quando você UPDATE as infos do usuario, incluindo a senha e username, nao é necessário gerar novo token pois ja sabemos que o usuário está autenticado. Porém, se ele fizer o logout, na proxima vez que ele for logar, precisará das informações corretas - O id presente no JWT nao muda
-
-//Comments:
-//1. Query all comments and store it in a variable "comments"
-//2. Map through all comments and check if(currentComment.replyTo !== null)
-//Se for, replyTo.replies.push(currentComment) - replyTo variable indicates what comment id the currentComment is replying to
-//Else, faz nada

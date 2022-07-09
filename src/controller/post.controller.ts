@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
+import CommentModel from "../models/comment.model";
 import FavoriteModel from "../models/favorite.model";
 import PostModel from "../models/post.model";
 import UpvoteModel from "../models/upvote.model";
@@ -106,6 +107,7 @@ export async function deletePostHandler(req: Request, res: Response) {
 
     await UpvoteModel.deleteMany({ postId: postId });
     await FavoriteModel.deleteMany({ postId: postId });
+    await CommentModel.deleteMany({ postId: postId });
 
     return res
       .status(200)

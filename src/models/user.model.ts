@@ -6,9 +6,11 @@ const userSchema = new mongoose.Schema<IUser>(
     name: {
       type: String,
       required: true,
-      match: [/^[a-zA-Z_]+( [a-zA-Z_]+)*$/, "O nome é inválido"],
+      match: [
+        /^[a-zA-Z_a-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ]+( [a-zA-Z_]+)*$/,
+        "O nome é inválido",
+      ],
       minlength: [1, "Pelo menos 1 caracter."],
-      maxlength: [30, "No maximo 30 caracteres"],
     },
     username: { type: String, required: true, unique: true },
     picture: { type: String, required: true },
