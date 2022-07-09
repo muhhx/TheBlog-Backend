@@ -45,7 +45,6 @@ import {
   postCommentHandler,
   deleteCommentHandler,
   updateCommentHandler,
-  upvoteCommentHandler,
   getCommentsHandler,
 } from "./controller/comment.controller";
 import { getBackgroundHandler } from "./controller/background.controller";
@@ -97,7 +96,6 @@ function routes(app: Express) {
   app.post("/api/comment/:postId", verifyUser, postCommentHandler); //(Comment on a post)
   app.delete("/api/comment/:commentId", verifyUser, deleteCommentHandler); // Delete comment - dono do comentário
   app.put("/api/comment/:commentId", verifyUser, updateCommentHandler); //(Update comment) dono do comentário
-  app.put("/api/comment/upvote/:commentId", verifyUser, upvoteCommentHandler); //(update commment upvoteCount + 1) Auth (precisa estar autenticado para poder fazer isso)
 
   //Tags (Post tags, user tags)
   //Comment

@@ -21,11 +21,14 @@ export async function postCommentHandler(req: Request, res: Response) {
       comment,
     });
 
-    return res.status(201).json({
-      success: "Error",
-      message: "Comentário criado com sucesso.",
-      createdComment,
-    });
+    const userData = await UserModel.find(
+      { _id: { $eq: user.userId } },
+      { _id: 1, name: 1, username: 1, picture: 1 }
+    );
+
+    return res
+      .status(201)
+      .json({ comment: createdComment, userData: userData[0] });
   } catch (error) {
     return res.sendStatus(500);
   }
@@ -37,11 +40,7 @@ export async function deleteCommentHandler(req: Request, res: Response) {
   try {
     const deletedComment = await CommentModel.findByIdAndDelete(commentId);
 
-    return res.status(200).json({
-      success: "Ok",
-      message: "Comentário deletado com sucesso.",
-      deletedComment,
-    });
+    return res.status(200).json(deletedComment);
   } catch (error) {
     return res.sendStatus(500);
   }
@@ -58,12 +57,13 @@ export async function updateCommentHandler(req: Request, res: Response) {
         .json({ success: "Error", message: "Comentário inválido." });
     }
 
-    await CommentModel.findOneAndUpdate({ _id: commentId }, { comment });
+    const updatedComment = await CommentModel.findOneAndUpdate(
+      { _id: commentId },
+      { comment },
+      { new: true }
+    );
 
-    return res.status(200).json({
-      success: "Ok",
-      message: "Comentário atualizado com sucesso.",
-    });
+    return res.status(200).json(updatedComment);
   } catch (error) {
     return res.sendStatus(500);
   }
@@ -71,16 +71,6 @@ export async function updateCommentHandler(req: Request, res: Response) {
 
 export async function getCommentsHandler(req: Request, res: Response) {
   const { postId } = req.params;
-
-  //1. Get all comments that postId === postId;
-  //2. Criar uma array de author Ids
-  //3. Get all users que estão inclusos nessa array de authorIds
-  //4. Para cada comentário, retornar um objeto contendo os dados do comentário + dados do autor (picture, name, username) || caso o authorId não esteja incluso na array, retornar "usuario deletado"
-  //
-  //1. Pegar todos os comentarios que contem postId
-  //2. Iterar os comentários, para cada comentario: buscar usuário com o authorId.
-  // caso user.lenght === 0, retornar "usuário nao encontrado"
-  // caso contrario, retornar dados do usuário
 
   try {
     const comments = await CommentModel.find({ postId: { $eq: postId } });
@@ -101,6 +91,7 @@ export async function getCommentsHandler(req: Request, res: Response) {
           finalArr.push({
             comment: comments[i],
             userData: {
+              _id: users[j]._id,
               picture: users[j].picture,
               name: users[j].name,
               username: users[j].username,
@@ -114,31 +105,17 @@ export async function getCommentsHandler(req: Request, res: Response) {
         finalArr.push({
           comment: comments[i],
           userData: {
+            _id: Math.random(),
             picture:
               "https://firebasestorage.googleapis.com/v0/b/the-blog-565e3.appspot.com/o/visax-IqZyFphHYbw-unsplash.jpg?alt=media&token=cde739f6-671e-4d7f-b519-44fa4422caa6",
             name: "Usuário deletado",
-            username: "usuariodeletado",
+            username: null,
           },
         });
       }
     }
 
-    return res.status(200).json({ success: "Ok", finalArr });
-  } catch (error) {
-    return res.sendStatus(500);
-  }
-}
-
-export async function upvoteCommentHandler(req: Request, res: Response) {
-  const { commentId } = req.params;
-
-  try {
-    await CommentModel.findOneAndUpdate(
-      { _id: commentId },
-      { $inc: { upvoteCount: 1 } }
-    );
-
-    return res.status(200).json({ status: "Ok" });
+    return res.status(200).json(finalArr);
   } catch (error) {
     return res.sendStatus(500);
   }
