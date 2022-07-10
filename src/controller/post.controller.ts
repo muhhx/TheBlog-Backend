@@ -13,7 +13,6 @@ export async function createPostHandler(req: Request, res: Response) {
   const { userId } = req.user;
   const { title, summaryInput, image, content } = req.body;
 
-  //Validate input fields
   if (!title || !summaryInput || !image || !content) {
     return res
       .status(400)
@@ -45,7 +44,6 @@ export async function createPostHandler(req: Request, res: Response) {
   const slug = createSlug(title);
   const summary = createSummary(summaryInput);
 
-  //Save to the database
   try {
     const post = await PostModel.create({
       slug,

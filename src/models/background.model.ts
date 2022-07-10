@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import IBackground from "../interface/background.interface";
 
 const backgroundSchema = new mongoose.Schema(
   {

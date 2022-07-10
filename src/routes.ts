@@ -54,55 +54,52 @@ import verifyUser from "./middleware/verifyUser";
 import errorHandling from "./middleware/errorHandling";
 
 function routes(app: Express) {
-  app.get("/api/background", getBackgroundHandler); //DONE
+  app.get("/api/background", getBackgroundHandler);
 
-  app.put("/api/user", verifyUser, updateUserHandler); //DONE
-  app.put("/api/user/password", verifyUser, updatePasswordHandler); //DONE
-  app.post("/api/user", registerUserHandler); //DONE
-  app.put("/api/user/delete", verifyUser, deleteUserHandler); //DONE
+  app.put("/api/user", verifyUser, updateUserHandler);
+  app.put("/api/user/password", verifyUser, updatePasswordHandler);
+  app.post("/api/user", registerUserHandler);
+  app.put("/api/user/delete", verifyUser, deleteUserHandler);
 
-  app.get("/api/user/:username", getUserHandler); //DONE
-  app.get("/api/user/:username/followers", userFollowersHandler); //DONE
-  app.get("/api/user/:username/following", userFollowingHandler); //DONE
-  app.get("/api/user/:username/posts", getUserPostsHandler); //DONE
-  app.get("/api/user/:username/favorites", verifyUser, userFavoritesHandler); //DONE
+  app.get("/api/user/:username", getUserHandler);
+  app.get("/api/user/:username/followers", userFollowersHandler);
+  app.get("/api/user/:username/following", userFollowingHandler);
+  app.get("/api/user/:username/posts", getUserPostsHandler);
+  app.get("/api/user/:username/favorites", verifyUser, userFavoritesHandler);
   app.get("/api/user/:id/foryou", verifyUser, getForyouHandler);
 
-  app.post("/api/forgotpassword", forgotPasswordHandler); //DONE (Problema, email n ta chegando usuario)
-  app.put("/api/resetpassword/:resetToken", resetPassowrdHandler); //DONE
-  app.post("/api/confirmemail", confirmEmailHandler); //DONE
-  app.put("/api/confirmemail/:confirmToken", validateEmailHandler); //DONE
+  app.post("/api/forgotpassword", forgotPasswordHandler);
+  app.put("/api/resetpassword/:resetToken", resetPassowrdHandler);
+  app.post("/api/confirmemail", confirmEmailHandler);
+  app.put("/api/confirmemail/:confirmToken", validateEmailHandler);
 
   app.get("/api/session/oauth/google", googleOauthHandler);
-  app.post("/api/session", loginSessionHandler); //DONE
-  app.delete("/api/session", logoutSessionHandler); //DONE
-  app.get("/api/session", verifyUser, verifySessionHandler); //DONE
-  app.put("/api/session", refreshTokenHandler); //DONE
+  app.post("/api/session", loginSessionHandler);
+  app.delete("/api/session", logoutSessionHandler);
+  app.get("/api/session", verifyUser, verifySessionHandler);
+  app.put("/api/session", refreshTokenHandler);
 
-  app.post("/api/follow/:targetId", verifyUser, userFollowHandler); //DONE
-  app.delete("/api/follow/:targetId", verifyUser, userUnfollowHandler); //DONE
+  app.post("/api/follow/:targetId", verifyUser, userFollowHandler);
+  app.delete("/api/follow/:targetId", verifyUser, userUnfollowHandler);
 
-  app.post("/api/post", verifyUser, createPostHandler); //DONE
-  app.delete("/api/post/:postId", verifyUser, deletePostHandler); //DONE -- REMOVER TODOS OS LIKES E SALVOS RELACIONADOS A ESSE POST
+  app.post("/api/post", verifyUser, createPostHandler);
+  app.delete("/api/post/:postId", verifyUser, deletePostHandler);
   app.put("/api/post/:postId", verifyUser, updatePostHandler);
-  app.get("/api/post/:slug", getPostHandler); //DONE
-  app.get("/api/post", getDiscoverHandler); //DONE
+  app.get("/api/post/:slug", getPostHandler);
+  app.get("/api/post", getDiscoverHandler);
 
-  //app/post?=query
-  //app/user?=query
+  app.post("/api/favorite/:postId", verifyUser, saveFavoriteHandler);
+  app.delete("/api/favorite/:postId", verifyUser, deleteFavoriteHandler);
+  app.put("/api/favorite/:postId", checkFavoriteHandler);
 
-  app.post("/api/favorite/:postId", verifyUser, saveFavoriteHandler); //DONE
-  app.delete("/api/favorite/:postId", verifyUser, deleteFavoriteHandler); //DONE
-  app.put("/api/favorite/:postId", checkFavoriteHandler); //DONE
+  app.post("/api/upvote/:postId", verifyUser, postUpvoteHandler);
+  app.delete("/api/upvote/:postId", verifyUser, deleteUpvoteHandler);
+  app.get("/api/upvote/:postId", getUpvoteHandler);
 
-  app.post("/api/upvote/:postId", verifyUser, postUpvoteHandler); //DONE
-  app.delete("/api/upvote/:postId", verifyUser, deleteUpvoteHandler); //DONE
-  app.get("/api/upvote/:postId", getUpvoteHandler); //DONE
-
-  app.get("/api/comment/:postId", getCommentsHandler); //DONE
-  app.post("/api/comment/:postId", verifyUser, postCommentHandler); //DONE
-  app.delete("/api/comment/:commentId", verifyUser, deleteCommentHandler); //DONE
-  app.put("/api/comment/:commentId", verifyUser, updateCommentHandler); //DONE
+  app.get("/api/comment/:postId", getCommentsHandler);
+  app.post("/api/comment/:postId", verifyUser, postCommentHandler);
+  app.delete("/api/comment/:commentId", verifyUser, deleteCommentHandler);
+  app.put("/api/comment/:commentId", verifyUser, updateCommentHandler);
 
   app.use(errorHandling);
 }

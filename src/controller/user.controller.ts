@@ -13,7 +13,6 @@ export async function registerUserHandler(req: Request, res: Response) {
   const { name, email, emailConfirmation, password, passwordConfirmation } =
     req.body;
 
-  //1. Data validation
   if (
     !name ||
     !email ||
@@ -54,15 +53,12 @@ export async function registerUserHandler(req: Request, res: Response) {
       .json({ status: "Error", message: "As senhas não são iguais." });
   }
 
-  //2. Encrypt password
   const salt = config.get<number>("bcryptSalt");
   const encryptedPassword = await bcrypt.hash(String(password), salt);
 
-  //3. Generate random username based on the Name provided
   const usernameHash = crypto.randomBytes(10);
   const username = usernameHash.toString("hex");
 
-  //3. Save to the database
   try {
     const createdUser = await UserModel.create({
       name,
@@ -236,7 +232,6 @@ export async function updatePasswordHandler(req: Request, res: Response) {
   const { userId } = req.user;
   const { password, passwordConfirmation } = req.body;
 
-  //Validar senhas
   if (!password && !passwordConfirmation) {
     return res
       .status(401)
@@ -299,7 +294,6 @@ export async function forgotPasswordHandler(req: Request, res: Response) {
 
   const user = await UserModel.findOne({ email });
 
-  //1. Verification
   if (!email) {
     return res
       .status(401)
@@ -319,7 +313,6 @@ export async function forgotPasswordHandler(req: Request, res: Response) {
   }
 
   try {
-    //2. Create tokens
     const resetToken = crypto.randomBytes(20).toString("hex");
     const resetExpire = Date.now() + 3 * (60 * 1000);
 
@@ -328,7 +321,6 @@ export async function forgotPasswordHandler(req: Request, res: Response) {
       resetPasswordExpire: resetExpire,
     });
 
-    //3. Send email
     const html = htmlMail("resetpassword", resetToken);
 
     const response = sendMail({
@@ -428,7 +420,6 @@ export async function confirmEmailHandler(req: Request, res: Response) {
 
   const user = await UserModel.findOne({ email });
 
-  //1. Validation (!email, email exists, email is already validated)
   if (!email) {
     return res
       .status(400)
@@ -452,20 +443,21 @@ export async function confirmEmailHandler(req: Request, res: Response) {
     });
   }
 
-  //2. Create tokens (confirmEmailToken, confirmEmailExpires)
   const confirmEmailToken = crypto.randomBytes(20).toString("hex");
   const confirmEmailExpire = Date.now() + 3 * (60 * 1000);
 
   try {
-    //3. Save them to the database
     await UserModel.findByIdAndUpdate(user.id, {
       confirmEmailToken,
       confirmEmailExpire,
     });
 
-    //4. Send email
     const html = htmlMail("confirmemail", confirmEmailToken);
-    const response = sendMail({ to: email, subject: "Confirm Email", html });
+    const response = await sendMail({
+      to: email,
+      subject: "Confirm Email",
+      html,
+    });
 
     if (!response) {
       await UserModel.findByIdAndUpdate(user.id, {

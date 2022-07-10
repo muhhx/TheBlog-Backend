@@ -17,5 +17,3 @@ export async function verifyJWT(token: string, key: string) {
     return null;
   }
 }
-
-//VERIFYJWT

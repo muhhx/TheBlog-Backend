@@ -8,9 +8,9 @@ interface IEmail {
 }
 
 export function htmlMail(endpoint: String, token: String) {
-  const url = config.get<string>("url");
+  const origin = config.get<string>("origin");
 
-  const link = `http://localhost:3000/${endpoint}/${token}`;
+  const link = `${origin}/${endpoint}/${token}`;
 
   const html = `<a href=${link} clicktracking=off>Click here to reset your password OR confirm your email</a>`;
 
@@ -21,11 +21,13 @@ export async function sendMail(options: IEmail) {
   const service = config.get<string>("nodemailerService");
   const user = config.get<string>("nodemailerUser");
   const pass = config.get<string>("nodemailerPass");
+  const host = config.get<string>("nodemailerHost");
+  const port = config.get<number>("nodemailerPort");
 
   const transporter = nodemailer.createTransport({
     service,
-    host: "smtp.gmail.com",
-    port: 465,
+    host,
+    port,
     auth: {
       user,
       pass,
@@ -44,6 +46,7 @@ export async function sendMail(options: IEmail) {
 
     return response;
   } catch (error) {
+    console.log(error);
     return null;
   }
 }

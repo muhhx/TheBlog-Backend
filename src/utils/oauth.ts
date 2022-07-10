@@ -1,6 +1,7 @@
 import axios from "axios";
 import qs from "qs";
 import log from "./logger";
+import config from "config";
 
 interface IGoogleTokensResult {
   access_token: string;
@@ -28,11 +29,15 @@ export async function getGoogleOAuthTokens({
 }): Promise<IGoogleTokensResult> {
   const url = "https://oauth2.googleapis.com/token";
 
+  const client_id = config.get<string>("client_id");
+  const client_secret = config.get<string>("client_secret");
+  const redirect_uri = config.get<string>("redirect_uri");
+
   const values = {
     code,
-    client_id: process.env.GOOGLE_CLIENT_ID as string,
-    client_secret: process.env.GOOGLE_CLIENT_SECRET as string,
-    redirect_uri: process.env.GOOGLE_OAUTH_REDIRECT_URL as string,
+    client_id,
+    client_secret,
+    redirect_uri,
     grant_type: "authorization_code",
   };
 
