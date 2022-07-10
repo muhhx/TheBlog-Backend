@@ -5,6 +5,7 @@ import FavoriteModel from "../models/favorite.model";
 import PostModel from "../models/post.model";
 import UpvoteModel from "../models/upvote.model";
 import UserModel from "../models/user.model";
+import FollowModel from "../models/follow.model";
 import { createSlug, createSummary } from "../utils/format";
 
 export async function createPostHandler(req: Request, res: Response) {
@@ -249,15 +250,49 @@ export async function getPostHandler(req: Request, res: Response) {
   }
 }
 
-export async function getPostsHandler(req: Request, res: Response) {
-  const queryParams = req.query["param"];
-  //Pagination
-  //Tags, etc
+export async function getDiscoverHandler(req: Request, res: Response) {
+  const pageQuery = req.query.page;
+
+  const ITEMS_PER_PAGE = 9;
 
   try {
-    const posts = await PostModel.find();
+    const skip = Number(pageQuery) * ITEMS_PER_PAGE;
 
-    return res.status(200).json({ status: "Ok", data: posts });
+    const posts = await PostModel.find().limit(ITEMS_PER_PAGE).skip(skip);
+
+    return res.status(200).json(posts);
+  } catch (error) {
+    return res.status(500).json({
+      status: "Error",
+      message: "Algo deu errado ao tentar acessar os posts.",
+    });
+  }
+}
+
+export async function getForyouHandler(req: Request, res: Response) {
+  // @ts-ignore
+  const user = req.user;
+  const pageQuery = req.query.page;
+
+  const ITEMS_PER_PAGE = 9;
+
+  try {
+    const skip = Number(pageQuery) * ITEMS_PER_PAGE;
+
+    const following = await FollowModel.find(
+      {
+        userId: { $eq: user.userId },
+      },
+      { targetId: 1 }
+    );
+
+    const followingIds = following.map((follow) => follow.targetId);
+
+    const posts = await PostModel.find({ authorId: { $in: followingIds } })
+      .limit(ITEMS_PER_PAGE)
+      .skip(skip);
+
+    return res.status(200).json(posts);
   } catch (error) {
     return res.status(500).json({
       status: "Error",

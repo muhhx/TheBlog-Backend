@@ -22,8 +22,9 @@ import {
   deletePostHandler,
   updatePostHandler,
   getPostHandler,
-  getPostsHandler,
   getUserPostsHandler,
+  getDiscoverHandler,
+  getForyouHandler,
 } from "./controller/post.controller";
 import {
   userFollowHandler,
@@ -65,6 +66,7 @@ function routes(app: Express) {
   app.get("/api/user/:username/following", userFollowingHandler); //DONE
   app.get("/api/user/:username/posts", getUserPostsHandler); //DONE
   app.get("/api/user/:username/favorites", verifyUser, userFavoritesHandler); //DONE
+  app.get("/api/user/:id/foryou", verifyUser, getForyouHandler);
 
   app.post("/api/forgotpassword", forgotPasswordHandler); //DONE (Problema, email n ta chegando usuario)
   app.put("/api/resetpassword/:resetToken", resetPassowrdHandler); //DONE
@@ -84,7 +86,10 @@ function routes(app: Express) {
   app.delete("/api/post/:postId", verifyUser, deletePostHandler); //DONE -- REMOVER TODOS OS LIKES E SALVOS RELACIONADOS A ESSE POST
   app.put("/api/post/:postId", verifyUser, updatePostHandler);
   app.get("/api/post/:slug", getPostHandler); //DONE
-  app.get("/api/post", getPostsHandler); //Add pagination + filters (specific tag, metatag or title research) + personalized content based on what the user likes (what tags did he liked. what types of tags he sees everyday, etc. - 10 posts per page (5 what he MOST like, 3 other tags that he likes 2 recomendations))
+  app.get("/api/post", getDiscoverHandler); //DONE
+
+  //app/post?=query
+  //app/user?=query
 
   app.post("/api/favorite/:postId", verifyUser, saveFavoriteHandler); //DONE
   app.delete("/api/favorite/:postId", verifyUser, deleteFavoriteHandler); //DONE
