@@ -1,5 +1,4 @@
-import nodemailer from "nodemailer";
-import config from "config";
+const nodemailer = require("nodemailer");
 
 interface IEmail {
   to: string;
@@ -8,7 +7,7 @@ interface IEmail {
 }
 
 export function htmlMail(endpoint: String, token: String) {
-  const origin = config.get<string>("origin");
+  const origin = process.env.ORIGIN;
 
   const link = `${origin}/${endpoint}/${token}`;
 
@@ -18,11 +17,11 @@ export function htmlMail(endpoint: String, token: String) {
 }
 
 export async function sendMail(options: IEmail) {
-  const service = config.get<string>("nodemailerService");
-  const user = config.get<string>("nodemailerUser");
-  const pass = config.get<string>("nodemailerPass");
-  const host = config.get<string>("nodemailerHost");
-  const port = config.get<number>("nodemailerPort");
+  const service = process.env.NODEMAILER_SERVICE;
+  const user = process.env.NODEMAILER_USER;
+  const pass = process.env.NODEMAILER_PASS;
+  const host = process.env.NODEMAILER_HOST;
+  const port = process.env.NODEMAILER_PORT;
 
   const transporter = nodemailer.createTransport({
     service,

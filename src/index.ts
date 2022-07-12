@@ -1,15 +1,15 @@
-import config from "config";
-import cors from "cors";
-import express from "express";
-import cookieParser from "cookie-parser";
+const cors = require("cors");
+const express = require("express");
+const cookieParser = require("cookie-parser");
+const dotenv = require("dotenv").config();
+
 import connect from "./utils/connect";
 import logger from "./utils/logger";
 import routes from "./routes";
 
 const app = express();
-const port = config.get<number>("port");
-const host = config.get<string>("host");
-const origin = config.get<string>("origin");
+const port = process.env.PORT;
+const origin = process.env.ORIGIN;
 
 const corsOptions = {
   origin,
@@ -22,8 +22,8 @@ app.use(cors(corsOptions));
 
 const start = async () => {
   await connect();
-  app.listen(port, host, () => {
-    logger.info(`Server listening at http://${host}:${port}...`);
+  app.listen(port, () => {
+    logger.info(`Server listening at port ${port}...`);
   });
   routes(app);
 };

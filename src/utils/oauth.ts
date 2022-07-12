@@ -1,7 +1,6 @@
-import axios from "axios";
-import qs from "qs";
+const axios = require("axios");
+const qs = require("qs");
 import log from "./logger";
-import config from "config";
 
 interface IGoogleTokensResult {
   access_token: string;
@@ -29,9 +28,9 @@ export async function getGoogleOAuthTokens({
 }): Promise<IGoogleTokensResult> {
   const url = "https://oauth2.googleapis.com/token";
 
-  const client_id = config.get<string>("client_id");
-  const client_secret = config.get<string>("client_secret");
-  const redirect_uri = config.get<string>("redirect_uri");
+  const client_id = process.env.GOOGLE_CLIENT_ID as string;
+  const client_secret = process.env.GOOGLE_CLIENT_SECRET as string;
+  const redirect_uri = process.env.GOOGLE_OAUTH_REDIRECT_URL as string;
 
   const values = {
     code,
@@ -42,17 +41,13 @@ export async function getGoogleOAuthTokens({
   };
 
   try {
-    const res = await axios.post<IGoogleTokensResult>(
-      url,
-      qs.stringify(values),
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
-    );
+    const res = await axios.post(url, qs.stringify(values), {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
 
-    return res.data;
+    return res.data as IGoogleTokensResult;
   } catch (error: any) {
     log.error(error, "Failed to fetch google OAuth Tokens");
     throw new Error(error.message);
@@ -67,7 +62,7 @@ export async function getGoogleUser({
   access_token: string;
 }): Promise<IGoogleUserResult> {
   try {
-    const res = await axios.get<IGoogleUserResult>(
+    const res = await axios.get(
       `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`,
       {
         headers: {
@@ -76,7 +71,7 @@ export async function getGoogleUser({
       }
     );
 
-    return res.data;
+    return res.data as IGoogleUserResult;
   } catch (error: any) {
     log.error(error, "Failed fetching Google User.");
     throw new Error(error.message);
