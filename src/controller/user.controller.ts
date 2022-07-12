@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
-import bcrypt from "bcrypt";
-import crypto from "crypto";
-import config from "config";
+const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 import UserModel from "../models/user.model";
 import { findUserWithoutPassword } from "../db";
 import { htmlMail, sendMail } from "../utils/email";
@@ -53,8 +52,7 @@ export async function registerUserHandler(req: Request, res: Response) {
       .json({ status: "Error", message: "As senhas não são iguais." });
   }
 
-  const salt = config.get<number>("bcryptSalt");
-  const encryptedPassword = await bcrypt.hash(String(password), salt);
+  const encryptedPassword = await bcrypt.hash(String(password), 10);
 
   const usernameHash = crypto.randomBytes(10);
   const username = usernameHash.toString("hex");

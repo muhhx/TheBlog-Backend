@@ -1,10 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import config from "config";
 import { verifyJWT } from "../utils/jwt";
 
 async function verifyUser(req: Request, res: Response, next: NextFunction) {
   const { accessToken } = req.cookies;
-  const accessKey = config.get<string>("accessTokenPrivateKey");
+  const accessKey = process.env.ACCESS_TOKEN_PRIVATE_KEY as string;
 
   if (!accessToken) {
     return res.status(401).json({

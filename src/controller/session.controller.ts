@@ -1,10 +1,9 @@
 import { Request, Response } from "express";
-import bcrypt from "bcrypt";
-import config from "config";
+const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 import UserModel from "../models/user.model";
 import { createJWT, verifyJWT } from "../utils/jwt";
 import { getGoogleOAuthTokens, getGoogleUser } from "../utils/oauth";
-import crypto from "crypto";
 
 export async function loginSessionHandler(req: Request, res: Response) {
   const { email, password } = req.body;
@@ -37,8 +36,8 @@ export async function loginSessionHandler(req: Request, res: Response) {
     });
   }
 
-  const accessKey = config.get<string>("accessTokenPrivateKey");
-  const refreshKey = config.get<string>("refreshTokenPrivateKey");
+  const accessKey = process.env.ACCESS_TOKEN_PRIVATE_KEY as string;
+  const refreshKey = process.env.REFRESH_TOKEN_PRIVATE_KEY as string;
 
   const payload = {
     userId: user._id,
@@ -157,7 +156,7 @@ export async function refreshTokenHandler(req: Request, res: Response) {
     }
 
     //3. Verificar se Token é valido (se ja n expirou e tals)
-    const refreshKey = config.get<string>("refreshTokenPrivateKey");
+    const refreshKey = process.env.REFRESH_TOKEN_PRIVATE_KEY as string;
     const decoded = await verifyJWT(refreshToken, refreshKey);
 
     if (!decoded) {
@@ -168,7 +167,7 @@ export async function refreshTokenHandler(req: Request, res: Response) {
     }
 
     //4. Gerar novo token
-    const accessKey = config.get<string>("accessTokenPrivateKey");
+    const accessKey = process.env.ACCESS_TOKEN_PRIVATE_KEY as string;
 
     const payload = {
       userId: user._id,
@@ -220,17 +219,16 @@ export async function googleOauthHandler(req: Request, res: Response) {
       isEmailVerified: false,
     };
 
-    const accessKey = config.get<string>("accessTokenPrivateKey");
-    const refreshKey = config.get<string>("refreshTokenPrivateKey");
+    const accessKey = process.env.ACCESS_TOKEN_PRIVATE_KEY as string;
+    const refreshKey = process.env.REFRESH_TOKEN_PRIVATE_KEY as string;
 
     if (!user) {
       const usernameHash = crypto.randomBytes(10);
       const username = usernameHash.toString("hex");
 
-      const salt = config.get<number>("bcryptSalt");
       const encryptedPassword = await bcrypt.hash(
         crypto.randomBytes(10).toString("hex"),
-        salt
+        10
       );
 
       const createdUser = await UserModel.create({
