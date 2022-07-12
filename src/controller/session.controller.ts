@@ -55,10 +55,14 @@ export async function loginSessionHandler(req: Request, res: Response) {
 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
+    sameSite: "none",
+    secure: true,
   });
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     maxAge: 1000 * 60 * 60 * 24,
+    sameSite: "none",
+    secure: true,
   });
 
   return res.status(200).json({
@@ -85,10 +89,14 @@ export async function logoutSessionHandler(req: Request, res: Response) {
     res.cookie("accessToken", "", {
       maxAge: 0,
       httpOnly: true,
+      sameSite: "none",
+      secure: true,
     });
     res.cookie("refreshToken", "", {
       maxAge: 0,
       httpOnly: true,
+      sameSite: "none",
+      secure: true,
     });
 
     return res
@@ -181,6 +189,8 @@ export async function refreshTokenHandler(req: Request, res: Response) {
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
+      sameSite: "none",
+      secure: true,
     });
 
     return res
@@ -257,10 +267,14 @@ export async function googleOauthHandler(req: Request, res: Response) {
       console.log(createdUser, payload, accessToken, refreshToken);
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
+        sameSite: "none",
+        secure: true,
       });
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24,
+        sameSite: "none",
+        secure: true,
       });
     } else {
       payload.userId = String(user._id);
@@ -277,10 +291,14 @@ export async function googleOauthHandler(req: Request, res: Response) {
 
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
+        sameSite: "none",
+        secure: true,
       });
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24,
+        sameSite: "none",
+        secure: true,
       });
     }
 
