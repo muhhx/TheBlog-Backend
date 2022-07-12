@@ -302,8 +302,8 @@ export async function googleOauthHandler(req: Request, res: Response) {
       });
     }
 
-    res.redirect(`https://theblogsocial.herokuapp.com`);
+    res.redirect(`${process.env.CLIENT_BASE_URL}`);
   } catch (error) {
-    return res.redirect(`https://theblogsocial.herokuapp.com/login`);
+    return res.redirect(`${process.env.CLIENT_BASE_URL}/login`);
   }
 }
