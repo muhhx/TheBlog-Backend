@@ -4,7 +4,6 @@ dotenv.config();
 export default {
   port: process.env.PORT,
   url: process.env.BASE_URL,
-  origin: process.env.ORIGIN,
   dbUri: process.env.MONGOOSE_URI,
   bcryptSalt: 10,
   accessTokenPrivateKey: process.env.ACCESS_TOKEN_PRIVATE_KEY,

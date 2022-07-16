@@ -9,10 +9,9 @@ import routes from "./routes";
 
 const app = express();
 const port = process.env.PORT;
-const origin = process.env.ORIGIN;
 
 const corsOptions = {
-  origin,
+  origin: true,
   credentials: true,
 };
 
