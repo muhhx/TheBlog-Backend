@@ -8,7 +8,7 @@ import logger from "./utils/logger";
 import routes from "./routes";
 
 const app = express();
-const port = process.env.PORT;
+const port = 5000 || process.env.PORT;
 const origin = process.env.ORIGIN;
 
 const corsOptions = {
@@ -16,9 +16,9 @@ const corsOptions = {
   credentials: true,
 };
 
+app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
-app.use(cors(corsOptions));
 
 const start = async () => {
   await connect();
