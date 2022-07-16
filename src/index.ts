@@ -8,7 +8,7 @@ import logger from "./utils/logger";
 import routes from "./routes";
 
 const app = express();
-const port = 5000 || process.env.PORT;
+const port = process.env.PORT;
 const origin = process.env.ORIGIN;
 
 const corsOptions = {
